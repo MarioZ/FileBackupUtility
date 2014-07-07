@@ -49,6 +49,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DatabaseController\ConnectionStringBuilder.cs" />
+    <Compile Include="DatabaseController\SqlDbManager.cs" />
     <Compile Include="FileController\FileItem.cs" />
     <Compile Include="FileController\FileItemCollection.cs" />
     <Compile Include="FileController\FileOptions.cs" />
@@ -81,9 +83,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="DatabaseController\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
