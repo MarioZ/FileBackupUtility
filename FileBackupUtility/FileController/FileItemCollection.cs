@@ -17,22 +17,26 @@ namespace FileBackupUtility.FileController
             this.fileItems = new List<FileItem>();
         }
 
-        public void AddRange(FileOptions options)
+        public IEnumerable<FileItem> AddRange(FileOptions options)
         {
-            if (string.IsNullOrWhiteSpace(options.Root))
-                return;
+            if (!string.IsNullOrWhiteSpace(options.Root))
+            {
+                this.options = options;
 
-            this.options = options;
+                if (this.options.IsArchiveRoot)
+                    foreach (var item in this.GetFileItemsFromZip().Where(i => i != null))
+                    {
+                        this.fileItems.Add(item);
+                        yield return item;
+                    }
 
-            if (this.options.IsArchiveRoot)
-                this.fileItems.AddRange(this.GetFileItemsFromZip());
-            else
-                this.fileItems.AddRange(this.GetFileItemsFromFolder());
-        }
-
-        public async System.Threading.Tasks.Task AddRangeAsync(FileOptions options)
-        {
-            await System.Threading.Tasks.Task.Run(() => this.AddRange(options));
+                else
+                    foreach (var item in this.GetFileItemsFromFolder().Where(i => i != null))
+                    {
+                        this.fileItems.Add(item);
+                        yield return item;
+                    }
+            }
         }
 
         public void Clear()
@@ -69,11 +73,7 @@ namespace FileBackupUtility.FileController
                     continue;
 
                 else if (this.CheckFileExtension(Path.GetExtension(entry.Name)))
-                {
-                    FileItem item = this.CreateFileItem(entry);
-                    if (item != null)
-                        yield return item;
-                }
+                    yield return this.CreateFileItem(entry);
             }
         }
 
@@ -85,11 +85,7 @@ namespace FileBackupUtility.FileController
                     break;
 
                 else if (this.CheckFileExtension(Path.GetExtension(file)))
-                {
-                    FileItem item = this.CreateFileItem(file);
-                    if (item != null)
-                        yield return item;
-                }
+                    yield return this.CreateFileItem(file);
             }
         }
 
@@ -122,16 +118,16 @@ namespace FileBackupUtility.FileController
         private bool CheckFileItemSize(FileItem item)
         {
             if ((this.options.FileSizeLimit != 0 &&
-                 item.Size > this.options.FileSizeLimit) ||
-                (item.Size > int.MaxValue))
+                item.Size > this.options.FileSizeLimit) ||
+                item.Size > int.MaxValue)
                 return false;
             return true;
         }
 
         private bool CheckFileItemCount()
         {
-            if ((this.options.SampleCountLimit != 0 &&
-                 this.Count == this.options.SampleCountLimit))
+            if (this.options.SampleCountLimit != 0 &&
+                this.Count == this.options.SampleCountLimit)
                 return false;
             return true;
         }
