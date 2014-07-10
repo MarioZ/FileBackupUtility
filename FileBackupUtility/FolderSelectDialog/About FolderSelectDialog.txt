@@ -1,0 +1,4 @@
+﻿
+Windows 7 style folder dialog.
+
+Read more here: http://www.lyquidity.com/devblog/?p=136

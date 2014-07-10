@@ -54,6 +54,8 @@
     <Compile Include="FileController\FileItem.cs" />
     <Compile Include="FileController\FileItemCollection.cs" />
     <Compile Include="FileController\FileOptions.cs" />
+    <Compile Include="FolderSelectDialog\FolderSelectDialog.cs" />
+    <Compile Include="FolderSelectDialog\Reflector.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -86,7 +88,9 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="FolderSelectDialog\About FolderSelectDialog.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

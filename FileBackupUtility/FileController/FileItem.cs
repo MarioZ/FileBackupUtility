@@ -13,23 +13,25 @@ namespace FileBackupUtility.FileController
         abstract public DateTime? Created { get; }
         abstract public DateTime? Modified { get; }
         abstract public string ToBase64String();
-        abstract public string ToMD5Hash();
+        abstract public string ToMD5HashString();
     }
 
     public sealed class PhysicalFileItem : FileItem
     {
         private readonly FileInfo fileInfo;
+        private readonly int size;
 
         public override string Folder { get { return this.fileInfo.DirectoryName; } }
         public override string Name { get { return this.fileInfo.Name; } }
         public override string Extension { get { return this.fileInfo.Extension.Replace(".", string.Empty).ToUpper(); } }
-        public override int Size { get { return (int)this.fileInfo.Length; } }
+        public override int Size { get { return this.size; } }
         public override DateTime? Created { get { return this.fileInfo.CreationTime; } }
         public override DateTime? Modified { get { return this.fileInfo.LastWriteTime; } }
 
         public PhysicalFileItem(string filePath)
         {
             this.fileInfo = new FileInfo(filePath);
+            this.size = (int)this.fileInfo.Length;
         }
 
         public override string ToBase64String()
@@ -37,7 +39,7 @@ namespace FileBackupUtility.FileController
             return Convert.ToBase64String(File.ReadAllBytes(this.fileInfo.FullName));
         }
 
-        public override string ToMD5Hash()
+        public override string ToMD5HashString()
         {
             using (var md5 = System.Security.Cryptography.MD5.Create())
             using (var fileStream = File.OpenRead(this.fileInfo.FullName))
@@ -49,17 +51,19 @@ namespace FileBackupUtility.FileController
     {
         private readonly ZipArchiveEntry fileZipEntry;
         private readonly string folder;
+        private readonly int size;
 
         public override string Folder { get { return this.folder; } }
         public override string Name { get { return this.fileZipEntry.Name; } }
         public override string Extension { get { return Path.GetExtension(this.fileZipEntry.Name).Replace(".", string.Empty).ToUpper(); } }
-        public override int Size { get { return (int)this.fileZipEntry.Length; } }
+        public override int Size { get { return this.size; } }
         public override DateTime? Created { get { return null; } }
         public override DateTime? Modified { get { return this.fileZipEntry.LastWriteTime.DateTime; } }
 
         public ArchiveFileItem(ZipArchiveEntry fileZipEntry, string zipPath)
         {
             this.fileZipEntry = fileZipEntry;
+            this.size = (int)this.fileZipEntry.Length;
             if (fileZipEntry.FullName != fileZipEntry.Name)
                 this.folder = Path.Combine(
                                 zipPath,
@@ -81,7 +85,7 @@ namespace FileBackupUtility.FileController
             return Convert.ToBase64String(fileData);
         }
 
-        public override string ToMD5Hash()
+        public override string ToMD5HashString()
         {
             using (var md5 = System.Security.Cryptography.MD5.Create())
             using (var zipStream = this.fileZipEntry.Open())

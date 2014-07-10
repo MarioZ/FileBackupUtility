@@ -1,5 +1,4 @@
-﻿using System;
-using System.Data.SqlClient;
+﻿using System.Data.SqlClient;
 
 namespace FileBackupUtility.DatabaseController
 {
@@ -17,21 +16,22 @@ namespace FileBackupUtility.DatabaseController
 
         public string GetFullConnectionString()
         {
-            SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
+            var builder = new SqlConnectionStringBuilder()
+                          {
+                              DataSource = this.DataSource,
+                              InitialCatalog = this.InitialCatalog,
+                              IntegratedSecurity = true
+                          };
 
-            builder.DataSource = this.DataSource;
-            builder.InitialCatalog = this.InitialCatalog;
-            builder.IntegratedSecurity = true;
-
-            if (this.IsSqlAuth == true)
+            if (this.IsSqlAuth)
             {
                 builder.UserID = this.UserID;
                 builder.Password = this.Password;
                 builder.IntegratedSecurity = false;
-                if (IsIPSelected == true)
+                if (IsIPSelected)
                 {
                     builder.NetworkLibrary = "DBMSSOCN";
-                    builder.DataSource = builder.DataSource + "," + this.Port;
+                    builder.DataSource = string.Format("{0},{1}", builder.DataSource, this.Port);
                 }
             }
 
@@ -40,25 +40,25 @@ namespace FileBackupUtility.DatabaseController
 
         public string GetDataSourceConnectionString()
         {
-            SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
+            var builder = new SqlConnectionStringBuilder()
+                          {
+                              DataSource = this.DataSource,
+                              IntegratedSecurity = true
+                          };
 
-            builder.DataSource = this.DataSource;
-            builder.IntegratedSecurity = true;
-
-            if (this.IsSqlAuth == true)
+            if (this.IsSqlAuth)
             {
                 builder.UserID = this.UserID;
                 builder.Password = this.Password;
                 builder.IntegratedSecurity = false;
-                if (IsIPSelected == true)
+                if (IsIPSelected)
                 {
                     builder.NetworkLibrary = "DBMSSOCN";
                     builder.DataSource = builder.DataSource + "," + this.Port;
                 }
-
             }
-            return builder.ToString();
 
+            return builder.ToString();
         }
     }
 }

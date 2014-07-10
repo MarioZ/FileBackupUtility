@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Threading.Tasks;
 
 namespace FileBackupUtility.DatabaseController
 {
@@ -12,62 +11,32 @@ namespace FileBackupUtility.DatabaseController
         {
             using (SqlConnection conn = new SqlConnection(connection))
             {
-                try
-                {
-                    conn.Open();
-                }
-                catch (InvalidOperationException)
-                {
-                    return false;
-                }
-                catch (ArgumentException)
-                {
-                    return false;
-                }
-                catch (SqlException)
-                {
-                    return false;
-                }
-                catch (Exception)
-                {
-                    return false;
-                }
+                try { conn.Open(); }
+                catch (InvalidOperationException) { return false; }
+                catch (ArgumentException) { return false; }
+                catch (SqlException) { return false; }
+                catch (Exception) { return false; }
             }
-           
             return true;
-
         }
 
         public static List<string> GetAllDatabases(string connString)
         {
-            List<string> databaseNames = new List<string>();
-
+            var databaseNames = new List<string>();
             using (SqlConnection con = new SqlConnection(connString))
             {
-                try
-                {
-                    con.Open();
-                }
-                catch (SqlException)
-                {
-                    return null;
-                }
-                using (SqlCommand cmd = new SqlCommand("SELECT name from sys.databases", con))
+                try { con.Open(); }
+                catch (SqlException) { return null; }
+
+                using (var cmd = new SqlCommand("SELECT name from sys.databases", con))
                 {
                     try
                     {
                         using (IDataReader dr = cmd.ExecuteReader())
-                        {
                             while (dr.Read())
-                            {
                                 databaseNames.Add(dr[0].ToString());
-                            }
-                        }
                     }
-                    catch (SqlException)
-                    {
-              
-                    }
+                    catch (SqlException) { }
                 }
             }
             return databaseNames;
@@ -75,55 +44,34 @@ namespace FileBackupUtility.DatabaseController
 
         public static void CreateTable(string tableName, string connection)
         {
-            string newTableQuery = "CREATE TABLE " + tableName +
-                            " (ID INT  PRIMARY KEY IDENTITY," +
-                            "Folder VARCHAR(MAX) NOT NULL,FileName VARCHAR(200) NOT NULL,Exstension VARCHAR(200) NOT NULL," +
-                            "FileSize INT NOT NULL, Base64 TEXT NOT NULL, MD5Hash CHAR(32) NOT NULL, FileDateCreated DATETIME NULL,FileDateModified DATETIME  NULL)";
+            string newTableQuery = string.Format("CREATE TABLE {0} (ID INT PRIMARY KEY IDENTITY,Folder VARCHAR(MAX) NOT NULL,FileName VARCHAR(200) NOT NULL,Exstension VARCHAR(200) NOT NULL,FileSize INT NOT NULL, Base64 TEXT NOT NULL, MD5Hash CHAR(32) NOT NULL, FileDateCreated DATETIME NULL,FileDateModified DATETIME  NULL)", tableName);
 
-            using (SqlConnection conn = new SqlConnection(connection))
+            using (var conn = new SqlConnection(connection))
             {
-                try
-                {
-                    conn.Open();
-                }
-                catch (SqlException)
-                {
-           
-                }
+                try { conn.Open(); }
+                catch (SqlException) { }
 
-                using (SqlCommand cmd = new SqlCommand(newTableQuery, conn))
-                {
-                    if (CheckTableExists(connection, tableName) == false)
-                    {
+                using (var cmd = new SqlCommand(newTableQuery, conn))
+                    if (!CheckTableExists(connection, tableName))
                         ExecuteCommand(cmd);
-                    }
-                }
             }
-
-
         }
 
         public static bool CheckTableExists(string connection, string tableName)
         {
-            string sql = "SELECT count(*) as IsExists FROM dbo.sysobjects where id = object_id('[dbo].[" + tableName + "]')";
+            string sql = string.Format("SELECT count(*) as IsExists FROM dbo.sysobjects where id = object_id('[dbo].[{0}]')", tableName);
 
-            using (SqlConnection conn = new SqlConnection(connection))
+            using (var conn = new SqlConnection(connection))
             {
-                SqlCommand cmd = new SqlCommand(sql, conn);
+                var cmd = new SqlCommand(sql, conn);
 
                 try
                 {
                     conn.Open();
-                    if ((Int32)cmd.ExecuteScalar() > 0)
-                    {
+                    if ((int)cmd.ExecuteScalar() > 0)
                         return true;
-                    }
-
                 }
-                catch (SqlException)
-                {
-      
-                }
+                catch (SqlException) { }
             }
             return false;
         }
@@ -132,27 +80,15 @@ namespace FileBackupUtility.DatabaseController
         {
             string dropTableQuery = "DROP TABLE " + tableName;
 
-            using (SqlConnection conn = new SqlConnection(connection))
+            using (var conn = new SqlConnection(connection))
             {
-                try
-                {
-                    conn.Open();
-                }
-                catch (SqlException)
-                {
+                try { conn.Open(); }
+                catch (SqlException) { }
 
-                }
-
-                using (SqlCommand cmd = new SqlCommand(dropTableQuery, conn))
-                {
-
-                    using (SqlCommand drop = new SqlCommand(dropTableQuery, conn))
-                    {
+                using (var cmd = new SqlCommand(dropTableQuery, conn))
+                    using (var drop = new SqlCommand(dropTableQuery, conn))
                         ExecuteCommand(drop);
-                    }
-                }
             }
-
         }
 
         public static void SaveFileItem(string connection, string tableName)
@@ -202,26 +138,10 @@ namespace FileBackupUtility.DatabaseController
 
         private static void ExecuteCommand(SqlCommand cmd)
         {
-            try
-            {
-                cmd.ExecuteNonQuery();
-            }
-            catch (InvalidOperationException)
-            {
-    
-            }
-            catch (InvalidExpressionException)
-            {
-
-
-            }
-            catch (SqlException)
-            {
-            
-
-            }
-
+            try { cmd.ExecuteNonQuery(); }
+            catch (InvalidOperationException) { }
+            catch (InvalidExpressionException) { }
+            catch (SqlException) { }
         }
-
     }
 }

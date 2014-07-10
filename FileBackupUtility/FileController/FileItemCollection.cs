@@ -9,12 +9,15 @@ namespace FileBackupUtility.FileController
     {
         private List<FileItem> fileItems;
         private FileOptions options;
+        private long totalfileItemsSize;
 
         public int Count { get { return this.fileItems.Count; } }
+        public long TotalSize { get { return this.totalfileItemsSize; } }
 
         public FileItemCollection()
         {
             this.fileItems = new List<FileItem>();
+            this.totalfileItemsSize = 0;
         }
 
         public IEnumerable<FileItem> AddRange(FileOptions options)
@@ -41,6 +44,7 @@ namespace FileBackupUtility.FileController
 
         public void Clear()
         {
+            this.totalfileItemsSize = 0;
             this.fileItems.Clear();
         }
 
@@ -56,6 +60,7 @@ namespace FileBackupUtility.FileController
 
         public void RemoveAt(int index)
         {
+            this.totalfileItemsSize -= this.fileItems[index].Size;
             this.fileItems.RemoveAt(index);
         }
 
@@ -121,6 +126,8 @@ namespace FileBackupUtility.FileController
                 item.Size > this.options.FileSizeLimit) ||
                 item.Size > int.MaxValue)
                 return false;
+
+            this.totalfileItemsSize += item.Size;
             return true;
         }
 
