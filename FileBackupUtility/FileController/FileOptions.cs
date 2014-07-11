@@ -11,7 +11,7 @@ namespace FileBackupUtility.FileController
         public bool IsIncludeFilters { get; set; }
         public System.IO.SearchOption SearchOption { get; set; }
         public int FileSizeLimit { get; set; }
-        public int SampleCountLimit { get; set; }
+        public int FileCountLimit { get; set; }
 
         public FileOptions() { }
 

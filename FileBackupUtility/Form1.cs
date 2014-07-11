@@ -12,6 +12,16 @@ namespace FileBackupUtility
         private FileOptions options;
         private OpenFileDialog zipDialog;
         private FolderSelectDialog folderDialog;
+        private bool isValidConnection;
+
+        public MainForm()
+        {
+            this.InitializeComponent();
+            this.InitializeDoubleBufferedListView();
+            this.files = new FileItemCollection();
+            this.options = new FileOptions();
+            this.isValidConnection = false;
+        }
 
         private OpenFileDialog ZipDialog
         {
@@ -33,42 +43,10 @@ namespace FileBackupUtility
             }
         }
 
-        public MainForm()
+        private void InitializeDoubleBufferedListView()
         {
-            InitializeComponent();
-            InitializeDoubleBuffered(this.lvFileItems);
-            this.files = new FileItemCollection();
-
-            // TODO REMOVE
-            // Dummy FileOptions for testing.
-            this.options = new FileOptions();
-            this.options.IsIncludeFilters = true;
-            this.options.SetExtensionFilters(".doc,.docx,.htm");
-            this.options.SearchOption = System.IO.SearchOption.AllDirectories;
-        }
-
-        private static void InitializeDoubleBuffered(Control list)
-        {
-            list.GetType().GetProperty("DoubleBuffered", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
-                          .SetValue(list, true, null);
-        }
-
-        private void btnBrowse_Click(object sender, EventArgs e)
-        {
-            if (this.options.IsArchiveRoot = this.rbZip.Checked)
-            {
-                if (this.ZipDialog.ShowDialog() == DialogResult.OK)
-                    this.options.Root = this.ZipDialog.FileName;
-            }
-            else
-                if (this.FolderDialog.ShowDialog(this.Handle))
-                    this.options.Root = this.FolderDialog.FileName;
-        }
-
-        private void btnReady_Click(object sender, EventArgs e)
-        {
-            this.lvFileItems.Items.Clear();
-            this.InitializeBackgroundWorker().RunWorkerAsync();
+            this.lvFileItems.GetType().GetProperty("DoubleBuffered", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
+                            .SetValue(this.lvFileItems, true, null);
         }
 
         private BackgroundWorker InitializeBackgroundWorker()
@@ -90,13 +68,69 @@ namespace FileBackupUtility
                         new string[] { file.Name, string.Format("{0:0.0} kB", (file.Size / 1024d)) }) { ToolTipText = System.IO.Path.Combine(file.Folder, file.Name) });
             };
 
+            worker.RunWorkerCompleted += (sender, e) =>
+            {
+                this.SetProcessButtenEnabled();
+            };
+
             return worker;
+        }
+
+        #region User's workflow
+        private void btnTestConnection_Click(object sender, EventArgs e)
+        {
+            // TODO
+            this.isValidConnection = true;
+            this.lbDBName.Enabled = this.lbDTName.Enabled = this.cmbDatabaseNames.Enabled = this.txtTableName.Enabled = this.btnCreateTable.Enabled = this.isValidConnection;
+            this.SetProcessButtenEnabled();
+        }
+
+        private void btnCreateTable_Click(object sender, EventArgs e)
+        {
+            // TODO
+        }
+
+        private void btnBrowse_Click(object sender, EventArgs e)
+        {
+            if (this.options.IsArchiveRoot = this.rbZip.Checked)
+            {
+                this.ZipDialog.ShowDialog();
+                this.txtBrowse.Text = this.ZipDialog.FileName;
+            }
+            else
+            {
+                this.FolderDialog.ShowDialog(this.Handle);
+                this.txtBrowse.Text = this.FolderDialog.FileName;
+            }
+
+            this.options.Root = this.txtBrowse.Text;
+            if (string.IsNullOrEmpty(this.options.Root))
+                this.btnProcess.Enabled = false;
+        }
+
+        private void btnReady_Click(object sender, EventArgs e)
+        {
+            this.options.FileSizeLimit = (int)this.nudFileSizeLimit.Value * 1024;
+            this.options.FileCountLimit = (int)this.nudFileCountLimit.Value;
+            this.options.IsIncludeFilters = this.rbFiltersInclude.Checked;
+            this.options.SetExtensionFilters(this.txtFilters.Text);
+            this.options.SearchOption = (this.cbSubfolders.Checked) ? System.IO.SearchOption.AllDirectories : System.IO.SearchOption.TopDirectoryOnly;
+
+            this.lvFileItems.Items.Clear();
+            this.InitializeBackgroundWorker().RunWorkerAsync();
         }
 
         private void btnProcess_Click(object sender, EventArgs e)
         {
-            throw new NotImplementedException("TODO");
+            // TODO
+            this.btnAbort.Enabled = true;
         }
+
+        private void btnAbort_Click(object sender, EventArgs e)
+        {
+            // TODO
+        }
+        #endregion
 
         private void lvFileItems_MouseClick(object sender, MouseEventArgs e)
         {
@@ -118,6 +152,16 @@ namespace FileBackupUtility
                 this.files.RemoveAt(item.Index);
                 item.Remove();
             }
+        }
+
+        private void rbAuth_CheckedChanged(object sender, EventArgs e)
+        {
+            this.lbUsername.Enabled = this.lbPassword.Enabled = this.txtUsername.Enabled = this.txtPassword.Enabled = this.rbSqlAuth.Checked;
+        }
+
+        private void SetProcessButtenEnabled()
+        {
+            this.btnProcess.Enabled = this.isValidConnection && this.files.Count > 0;
         }
     }
 }

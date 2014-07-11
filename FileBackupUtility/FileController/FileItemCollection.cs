@@ -22,7 +22,7 @@ namespace FileBackupUtility.FileController
 
         public IEnumerable<FileItem> AddRange(FileOptions options)
         {
-            if (!string.IsNullOrWhiteSpace(options.Root))
+            if (!string.IsNullOrEmpty(options.Root))
             {
                 this.options = options;
 
@@ -133,8 +133,8 @@ namespace FileBackupUtility.FileController
 
         private bool CheckFileItemCount()
         {
-            if (this.options.SampleCountLimit != 0 &&
-                this.Count == this.options.SampleCountLimit)
+            if (this.options.FileCountLimit != 0 &&
+                this.Count == this.options.FileCountLimit)
                 return false;
             return true;
         }
