@@ -17,7 +17,7 @@ namespace FileBackupUtility
         public MainForm()
         {
             this.InitializeComponent();
-            this.InitializeDoubleBufferedListView();
+            this.InitializeListViewEnhancements();
             this.files = new FileItemCollection();
             this.options = new FileOptions();
             this.isValidConnection = false;
@@ -32,7 +32,6 @@ namespace FileBackupUtility
                 return this.zipDialog;
             }
         }
-
         private FolderSelectDialog FolderDialog
         {
             get
@@ -43,10 +42,16 @@ namespace FileBackupUtility
             }
         }
 
-        private void InitializeDoubleBufferedListView()
+        private void InitializeListViewEnhancements()
         {
             this.lvFileItems.GetType().GetProperty("DoubleBuffered", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
                             .SetValue(this.lvFileItems, true, null);
+
+            this.lvFileItems.LostFocus += (sender, e) =>
+            {
+                for (int i = 0; i < this.lvFileItems.SelectedIndices.Count; i++)
+                    this.lvFileItems.Items[this.lvFileItems.SelectedIndices[i]].Selected = false;
+            };
         }
 
         private BackgroundWorker InitializeBackgroundWorker()
@@ -92,20 +97,23 @@ namespace FileBackupUtility
 
         private void btnBrowse_Click(object sender, EventArgs e)
         {
-            if (this.options.IsArchiveRoot = this.rbZip.Checked)
+            bool dialogResult;
+            if (this.rbZip.Checked)
             {
-                this.ZipDialog.ShowDialog();
+                dialogResult = this.ZipDialog.ShowDialog() == DialogResult.OK;
                 this.txtBrowse.Text = this.ZipDialog.FileName;
             }
             else
             {
-                this.FolderDialog.ShowDialog(this.Handle);
+                dialogResult = this.FolderDialog.ShowDialog(this.Handle);
                 this.txtBrowse.Text = this.FolderDialog.FileName;
             }
 
-            this.options.Root = this.txtBrowse.Text;
-            if (string.IsNullOrEmpty(this.options.Root))
+            if (!dialogResult)
+            {
                 this.btnProcess.Enabled = false;
+                this.txtBrowse.Text = string.Empty;
+            }
         }
 
         private void btnReady_Click(object sender, EventArgs e)
@@ -114,6 +122,9 @@ namespace FileBackupUtility
             this.options.FileCountLimit = (int)this.nudFileCountLimit.Value;
             this.options.IsIncludeFilters = this.rbFiltersInclude.Checked;
             this.options.SetExtensionFilters(this.txtFilters.Text);
+
+            this.options.IsArchiveRoot = this.rbZip.Checked;
+            this.options.Root = this.txtBrowse.Text;
             this.options.SearchOption = (this.cbSubfolders.Checked) ? System.IO.SearchOption.AllDirectories : System.IO.SearchOption.TopDirectoryOnly;
 
             this.lvFileItems.Items.Clear();
@@ -123,18 +134,19 @@ namespace FileBackupUtility
         private void btnProcess_Click(object sender, EventArgs e)
         {
             // TODO
-            this.btnAbort.Enabled = true;
+            this.SetSettingsGroupBoxEnabled(false);
         }
 
         private void btnAbort_Click(object sender, EventArgs e)
         {
             // TODO
+            this.SetSettingsGroupBoxEnabled(true);
         }
         #endregion
 
         private void lvFileItems_MouseClick(object sender, MouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Right)
+            if (e.Button == MouseButtons.Right && this.btnReady.Enabled)
             {
                 ListViewItem item = this.lvFileItems.GetItemAt(e.X, e.Y);
                 if (item != null)
@@ -143,6 +155,12 @@ namespace FileBackupUtility
                     this.lvContextMenuStrip.Show(this.lvFileItems, e.Location);
                 }
             }
+        }
+
+        private void lvFileItems_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
+        {
+            if (!this.btnReady.Enabled)
+                e.Item.Selected = false;
         }
 
         private void lvToolStripMenuItem_Click(object sender, EventArgs e)
@@ -159,9 +177,23 @@ namespace FileBackupUtility
             this.lbUsername.Enabled = this.lbPassword.Enabled = this.txtUsername.Enabled = this.txtPassword.Enabled = this.rbSqlAuth.Checked;
         }
 
+        private void rbFolder_CheckedChanged(object sender, EventArgs e)
+        {
+            if (this.rbZip.Checked)
+                this.btnBrowse.Image = Properties.Resources.Zip;
+            else
+                this.btnBrowse.Image = Properties.Resources.Folder;
+        }
+
         private void SetProcessButtenEnabled()
         {
             this.btnProcess.Enabled = this.isValidConnection && this.files.Count > 0;
+        }
+
+        private void SetSettingsGroupBoxEnabled(bool enable)
+        {
+            this.gbDatabaseSettings.Enabled = this.gbFileSettings.Enabled = this.gbFolderSettings.Enabled = this.btnReady.Enabled = enable;
+            this.btnAbort.Enabled = !enable;
         }
     }
 }

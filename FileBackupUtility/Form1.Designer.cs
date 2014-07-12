@@ -99,6 +99,7 @@
             this.lvFileItems.TabStop = false;
             this.lvFileItems.UseCompatibleStateImageBehavior = false;
             this.lvFileItems.View = System.Windows.Forms.View.Details;
+            this.lvFileItems.ItemSelectionChanged += new System.Windows.Forms.ListViewItemSelectionChangedEventHandler(this.lvFileItems_ItemSelectionChanged);
             this.lvFileItems.MouseClick += new System.Windows.Forms.MouseEventHandler(this.lvFileItems_MouseClick);
             // 
             // column1
@@ -115,11 +116,11 @@
             // 
             this.btnReady.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnReady.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.btnReady.Image = global::FileBackupUtility.Properties.Resources.Ready;
             this.btnReady.Location = new System.Drawing.Point(352, 554);
             this.btnReady.Name = "btnReady";
             this.btnReady.Size = new System.Drawing.Size(100, 55);
             this.btnReady.TabIndex = 1;
-            this.btnReady.Text = "Ready";
             this.btnReady.UseVisualStyleBackColor = true;
             this.btnReady.Click += new System.EventHandler(this.btnReady_Click);
             // 
@@ -128,11 +129,11 @@
             this.btnProcess.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnProcess.Enabled = false;
             this.btnProcess.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.btnProcess.Image = global::FileBackupUtility.Properties.Resources.Process;
             this.btnProcess.Location = new System.Drawing.Point(458, 554);
             this.btnProcess.Name = "btnProcess";
             this.btnProcess.Size = new System.Drawing.Size(138, 55);
             this.btnProcess.TabIndex = 2;
-            this.btnProcess.Text = "Process";
             this.btnProcess.UseVisualStyleBackColor = true;
             this.btnProcess.Click += new System.EventHandler(this.btnProcess_Click);
             // 
@@ -153,6 +154,7 @@
             // 
             // lvToolStripMenuItem
             // 
+            this.lvToolStripMenuItem.Image = global::FileBackupUtility.Properties.Resources.Remove;
             this.lvToolStripMenuItem.Name = "lvToolStripMenuItem";
             this.lvToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
             this.lvToolStripMenuItem.Text = "Remove Selected";
@@ -163,11 +165,11 @@
             this.btnAbort.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnAbort.Enabled = false;
             this.btnAbort.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.btnAbort.Image = global::FileBackupUtility.Properties.Resources.Abort;
             this.btnAbort.Location = new System.Drawing.Point(602, 554);
             this.btnAbort.Name = "btnAbort";
             this.btnAbort.Size = new System.Drawing.Size(100, 55);
             this.btnAbort.TabIndex = 7;
-            this.btnAbort.Text = "Abort";
             this.btnAbort.UseVisualStyleBackColor = true;
             this.btnAbort.Click += new System.EventHandler(this.btnAbort_Click);
             // 
@@ -196,7 +198,7 @@
             this.cbSubfolders.Checked = true;
             this.cbSubfolders.CheckState = System.Windows.Forms.CheckState.Checked;
             this.cbSubfolders.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.cbSubfolders.Location = new System.Drawing.Point(132, 91);
+            this.cbSubfolders.Location = new System.Drawing.Point(148, 91);
             this.cbSubfolders.Name = "cbSubfolders";
             this.cbSubfolders.Size = new System.Drawing.Size(112, 17);
             this.cbSubfolders.TabIndex = 13;
@@ -212,7 +214,7 @@
             this.txtBrowse.Location = new System.Drawing.Point(6, 65);
             this.txtBrowse.Name = "txtBrowse";
             this.txtBrowse.ReadOnly = true;
-            this.txtBrowse.Size = new System.Drawing.Size(238, 20);
+            this.txtBrowse.Size = new System.Drawing.Size(254, 20);
             this.txtBrowse.TabIndex = 12;
             // 
             // rbZip
@@ -225,6 +227,7 @@
             this.rbZip.TabIndex = 11;
             this.rbZip.Text = "Zip";
             this.rbZip.UseVisualStyleBackColor = true;
+            this.rbZip.CheckedChanged += new System.EventHandler(this.rbFolder_CheckedChanged);
             // 
             // rbFolder
             // 
@@ -238,16 +241,17 @@
             this.rbFolder.TabStop = true;
             this.rbFolder.Text = "Folder";
             this.rbFolder.UseVisualStyleBackColor = true;
+            this.rbFolder.CheckedChanged += new System.EventHandler(this.rbFolder_CheckedChanged);
             // 
             // btnBrowse
             // 
             this.btnBrowse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnBrowse.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.btnBrowse.Location = new System.Drawing.Point(250, 63);
+            this.btnBrowse.Image = global::FileBackupUtility.Properties.Resources.Folder;
+            this.btnBrowse.Location = new System.Drawing.Point(266, 63);
             this.btnBrowse.Name = "btnBrowse";
-            this.btnBrowse.Size = new System.Drawing.Size(70, 23);
+            this.btnBrowse.Size = new System.Drawing.Size(45, 45);
             this.btnBrowse.TabIndex = 9;
-            this.btnBrowse.Text = "Browse";
             this.btnBrowse.UseVisualStyleBackColor = true;
             this.btnBrowse.Click += new System.EventHandler(this.btnBrowse_Click);
             // 

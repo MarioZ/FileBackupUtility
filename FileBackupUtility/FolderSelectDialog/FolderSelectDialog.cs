@@ -12,7 +12,7 @@ namespace FileBackupUtility.FolderSelect
 	/// Wraps System.Windows.Forms.OpenFileDialog to make it present
 	/// a vista-style dialog.
 	/// </summary>
-	public class FolderSelectDialog
+	public class FolderSelectDialog : IDisposable
 	{
 		// Wrapped dialog
 		System.Windows.Forms.OpenFileDialog ofd = null;
@@ -124,6 +124,26 @@ namespace FileBackupUtility.FolderSelect
 		}
 
 		#endregion
+
+		~FolderSelectDialog()
+		{
+			this.Dispose(false);
+		}
+
+		public void Dispose()
+		{
+			this.Dispose(true);
+			GC.SuppressFinalize(this); 
+		}
+
+		protected virtual void Dispose(bool disposing)
+		{
+			if (disposing && this.ofd != null)
+			{
+				this.ofd.Dispose();
+				this.ofd = null;
+			}
+		}
 	}
 
 	/// <summary>

@@ -90,6 +90,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="FolderSelectDialog\About FolderSelectDialog.txt" />
+    <None Include="Resources\Ready.png" />
+    <None Include="Resources\Zip.png" />
+    <None Include="Resources\Folder.png" />
+    <None Include="Resources\Remove.png" />
+    <None Include="Resources\Process.png" />
+    <None Include="Resources\Abort.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
