@@ -90,6 +90,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="FolderSelectDialog\About FolderSelectDialog.txt" />
+    <None Include="Resources\DataTableUNKNOWN.png" />
+    <None Include="Resources\DataTableOK.png" />
     <None Include="Resources\Ready.png" />
     <None Include="Resources\Zip.png" />
     <None Include="Resources\Folder.png" />

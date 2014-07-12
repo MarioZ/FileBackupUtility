@@ -3,6 +3,7 @@ using System.Windows.Forms;
 using System.ComponentModel;
 using FileBackupUtility.FileController;
 using FileBackupUtility.FolderSelect;
+using FileBackupUtility.DatabaseController;
 
 namespace FileBackupUtility
 {
@@ -12,7 +13,7 @@ namespace FileBackupUtility
         private FileOptions options;
         private OpenFileDialog zipDialog;
         private FolderSelectDialog folderDialog;
-        private bool isValidConnection;
+        private bool isValidConnection, isValidDataTable;
 
         public MainForm()
         {
@@ -20,7 +21,8 @@ namespace FileBackupUtility
             this.InitializeListViewEnhancements();
             this.files = new FileItemCollection();
             this.options = new FileOptions();
-            this.isValidConnection = false;
+            this.ConnectionBuilder = new ConnectionStringBuilder();
+            this.isValidConnection = this.isValidDataTable = false;
         }
 
         private OpenFileDialog ZipDialog
@@ -41,6 +43,8 @@ namespace FileBackupUtility
                 return this.folderDialog;
             }
         }
+        private ConnectionStringBuilder ConnectionBuilder { get; set; }
+        private string Connection { get; set; }
 
         private void InitializeListViewEnhancements()
         {
@@ -84,15 +88,34 @@ namespace FileBackupUtility
         #region User's workflow
         private void btnTestConnection_Click(object sender, EventArgs e)
         {
-            // TODO
-            this.isValidConnection = true;
-            this.lbDBName.Enabled = this.lbDTName.Enabled = this.cmbDatabaseNames.Enabled = this.txtTableName.Enabled = this.btnCreateTable.Enabled = this.isValidConnection;
-            this.SetProcessButtenEnabled();
+            this.ConnectionBuilder.DataSource = this.txtServer.Text;
+            this.ConnectionBuilder.Port = this.txtPort.Text;
+            this.ConnectionBuilder.IsIPSelected = this.cbIPAddress.Checked;
+            this.ConnectionBuilder.IsSqlAuth = this.rbSqlAuth.Checked;
+            this.ConnectionBuilder.UserID = this.txtUsername.Text;
+            this.ConnectionBuilder.Password = this.txtPassword.Text;
+            this.ConnectionBuilder.InitialCatalog = "DUNNO";
+            this.Connection = this.ConnectionBuilder.GetFullConnectionString();
+
+            if (true)//SqlDbManager.TestConnection(this.Connection))
+            {
+                this.cmbDatabaseNames.DataSource = new string[] { "DB1", "DB2", "DB3" };//SqlDbManager.GetAllDatabases(this.Connection);
+                this.SetValidConnectionEnabled(true);
+            }
         }
 
         private void btnCreateTable_Click(object sender, EventArgs e)
         {
-            // TODO
+            if (false)//SqlDbManager.CheckTableExists(this.txtTableName.Text, this.Connection))
+            {
+                if (true)
+                    SqlDbManager.DropTable(this.txtTableName.Text, this.Connection);
+            }
+
+            //SqlDbManager.CreateTable(this.txtTableName.Text, this.Connection);
+            this.isValidDataTable = true;
+            this.btnCreateTable.Image = Properties.Resources.DataTableOK;
+            this.SetProcessButtenEnabled();
         }
 
         private void btnBrowse_Click(object sender, EventArgs e)
@@ -170,11 +193,19 @@ namespace FileBackupUtility
                 this.files.RemoveAt(item.Index);
                 item.Remove();
             }
+            this.SetProcessButtenEnabled();
+        }
+
+        private void cbIPAddress_CheckedChanged(object sender, EventArgs e)
+        {
+            this.txtPort.Enabled = this.cbIPAddress.Checked;
+            this.serverOrAuthentificationChanged(sender, e);
         }
 
         private void rbAuth_CheckedChanged(object sender, EventArgs e)
         {
             this.lbUsername.Enabled = this.lbPassword.Enabled = this.txtUsername.Enabled = this.txtPassword.Enabled = this.rbSqlAuth.Checked;
+            this.serverOrAuthentificationChanged(sender, e);
         }
 
         private void rbFolder_CheckedChanged(object sender, EventArgs e)
@@ -185,9 +216,28 @@ namespace FileBackupUtility
                 this.btnBrowse.Image = Properties.Resources.Folder;
         }
 
+        private void serverOrAuthentificationChanged(object sender, EventArgs e)
+        {
+            this.isValidConnection = false;
+            this.SetValidConnectionEnabled(false);
+            this.databaseOrTableNameChanged(sender, e);
+        }
+
+        private void databaseOrTableNameChanged(object sender, EventArgs e)
+        {
+            this.isValidDataTable = false;
+            this.btnCreateTable.Image = Properties.Resources.DataTableUNKNOWN;
+            this.SetProcessButtenEnabled();
+        }
+
+        private void SetValidConnectionEnabled(bool enable)
+        {
+            this.isValidConnection = this.lbDBName.Enabled = this.lbDTName.Enabled = this.cmbDatabaseNames.Enabled = this.txtTableName.Enabled = this.btnCreateTable.Enabled = enable;
+        }
+
         private void SetProcessButtenEnabled()
         {
-            this.btnProcess.Enabled = this.isValidConnection && this.files.Count > 0;
+            this.btnProcess.Enabled = this.isValidDataTable && this.files.Count > 0;
         }
 
         private void SetSettingsGroupBoxEnabled(bool enable)

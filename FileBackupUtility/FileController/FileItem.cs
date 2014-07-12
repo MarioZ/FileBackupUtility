@@ -6,10 +6,12 @@ namespace FileBackupUtility.FileController
 {
     public abstract class FileItem
     {
+        protected int size;
+        public int Size { get { return this.size; } }
+
         abstract public string Folder { get; }
         abstract public string Name { get; }
         abstract public string Extension { get; }
-        abstract public int Size { get; }
         abstract public DateTime? Created { get; }
         abstract public DateTime? Modified { get; }
         abstract public string ToBase64String();
@@ -19,12 +21,10 @@ namespace FileBackupUtility.FileController
     public sealed class PhysicalFileItem : FileItem
     {
         private readonly FileInfo fileInfo;
-        private readonly int size;
 
         public override string Folder { get { return this.fileInfo.DirectoryName; } }
         public override string Name { get { return this.fileInfo.Name; } }
         public override string Extension { get { return this.fileInfo.Extension.Replace(".", string.Empty).ToUpper(); } }
-        public override int Size { get { return this.size; } }
         public override DateTime? Created { get { return this.fileInfo.CreationTime; } }
         public override DateTime? Modified { get { return this.fileInfo.LastWriteTime; } }
 
@@ -51,12 +51,10 @@ namespace FileBackupUtility.FileController
     {
         private readonly ZipArchiveEntry fileZipEntry;
         private readonly string folder;
-        private readonly int size;
 
         public override string Folder { get { return this.folder; } }
         public override string Name { get { return this.fileZipEntry.Name; } }
         public override string Extension { get { return Path.GetExtension(this.fileZipEntry.Name).Replace(".", string.Empty).ToUpper(); } }
-        public override int Size { get { return this.size; } }
         public override DateTime? Created { get { return null; } }
         public override DateTime? Modified { get { return this.fileZipEntry.LastWriteTime.DateTime; } }
 
@@ -65,10 +63,7 @@ namespace FileBackupUtility.FileController
             this.fileZipEntry = fileZipEntry;
             this.size = (int)this.fileZipEntry.Length;
             if (fileZipEntry.FullName != fileZipEntry.Name)
-                this.folder = Path.Combine(
-                                zipPath,
-                                fileZipEntry.FullName.Replace("/", "\\")
-                                                     .Substring(0, fileZipEntry.FullName.Length - fileZipEntry.Name.Length - 1));
+                this.folder = Path.Combine(zipPath, fileZipEntry.FullName.Replace("/", "\\").Substring(0, fileZipEntry.FullName.Length - fileZipEntry.Name.Length - 1));
             else
                 this.folder = zipPath;
         }
