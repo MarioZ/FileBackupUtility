@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Collections.Generic;
@@ -22,24 +23,22 @@ namespace FileBackupUtility.FileController
 
         public IEnumerable<FileItem> AddRange(FileOptions options)
         {
-            if (!string.IsNullOrEmpty(options.Root))
-            {
-                this.options = options;
+            this.options = options;
 
-                if (this.options.IsArchiveRoot)
-                    foreach (var item in this.GetFileItemsFromZip().Where(i => i != null))
-                    {
-                        this.fileItems.Add(item);
-                        yield return item;
-                    }
+            if (this.options.IsArchiveRoot)
+                foreach (var item in this.GetFileItemsFromZip().Where(i => i != null))
+                {
+                    this.fileItems.Add(item);
+                    yield return item;
+                }
 
-                else
-                    foreach (var item in this.GetFileItemsFromFolder().Where(i => i != null))
-                    {
-                        this.fileItems.Add(item);
-                        yield return item;
-                    }
-            }
+
+            else
+                foreach (var item in this.GetFileItemsFromFolder().Where(i => i != null))
+                {
+                    this.fileItems.Add(item);
+                    yield return item;
+                }
         }
 
         public void Clear()
@@ -66,25 +65,24 @@ namespace FileBackupUtility.FileController
 
         private IEnumerable<FileItem> GetFileItemsFromZip()
         {
-            ZipArchive archive = ZipFile.OpenRead(this.options.Root);
-
-            foreach (ZipArchiveEntry entry in archive.Entries)
+            foreach (ZipArchiveEntry entry in ZipFile.OpenRead(this.options.Root).Entries)
             {
                 if (!this.CheckFileItemCount())
                     break;
 
                 else if (string.IsNullOrEmpty(entry.Name) ||
-                         this.options.SearchOption == SearchOption.TopDirectoryOnly && entry.FullName != entry.Name)
+                         !this.options.IncludeSubfolders && entry.FullName != entry.Name)
                     continue;
 
                 else if (this.CheckFileExtension(Path.GetExtension(entry.Name)))
                     yield return this.CreateFileItem(entry);
+
             }
         }
 
         private IEnumerable<FileItem> GetFileItemsFromFolder()
         {
-            foreach (var file in Directory.GetFiles(this.options.Root, "*", this.options.SearchOption))
+            foreach (var file in this.EnumerateFilesSafe(this.options.Root, "*", (this.options.IncludeSubfolders) ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly))
             {
                 if (!this.CheckFileItemCount())
                     break;
@@ -92,6 +90,22 @@ namespace FileBackupUtility.FileController
                 else if (this.CheckFileExtension(Path.GetExtension(file)))
                     yield return this.CreateFileItem(file);
             }
+        }
+
+        private IEnumerable<string> EnumerateFilesSafe(string path, string searchPattern, SearchOption searchOptions)
+        {
+            try
+            {
+                var files = Enumerable.Empty<string>();
+
+                if (searchOptions == SearchOption.AllDirectories)
+                    files = Directory.EnumerateDirectories(path)
+                                     .SelectMany(subFolder => this.EnumerateFilesSafe(subFolder, searchPattern, searchOptions));
+
+                return files.Concat(Directory.EnumerateFiles(path, searchPattern));
+            }
+            catch (UnauthorizedAccessException) { return Enumerable.Empty<string>(); }
+            catch (PathTooLongException) { return Enumerable.Empty<string>(); }
         }
 
         private FileItem CreateFileItem(ZipArchiveEntry fileZipEntry)

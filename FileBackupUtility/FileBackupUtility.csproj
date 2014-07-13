@@ -49,7 +49,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DatabaseController\ConnectionStringBuilder.cs" />
     <Compile Include="DatabaseController\SqlDbManager.cs" />
     <Compile Include="FileController\FileItem.cs" />
     <Compile Include="FileController\FileItemCollection.cs" />
@@ -90,6 +89,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="FolderSelectDialog\About FolderSelectDialog.txt" />
+    <None Include="Resources\ConnectionUKNOWN.png" />
+    <None Include="Resources\ConnectionOK.png" />
     <None Include="Resources\DataTableUNKNOWN.png" />
     <None Include="Resources\DataTableOK.png" />
     <None Include="Resources\Ready.png" />

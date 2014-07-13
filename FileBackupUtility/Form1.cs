@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Windows.Forms;
 using System.ComponentModel;
+using FileBackupUtility.DatabaseController;
 using FileBackupUtility.FileController;
 using FileBackupUtility.FolderSelect;
-using FileBackupUtility.DatabaseController;
 
 namespace FileBackupUtility
 {
@@ -13,7 +13,7 @@ namespace FileBackupUtility
         private FileOptions options;
         private OpenFileDialog zipDialog;
         private FolderSelectDialog folderDialog;
-        private bool isValidConnection, isValidDataTable;
+        private bool isValidDataTable;
 
         public MainForm()
         {
@@ -21,8 +21,7 @@ namespace FileBackupUtility
             this.InitializeListViewEnhancements();
             this.files = new FileItemCollection();
             this.options = new FileOptions();
-            this.ConnectionBuilder = new ConnectionStringBuilder();
-            this.isValidConnection = this.isValidDataTable = false;
+            this.isValidDataTable = false;
         }
 
         private OpenFileDialog ZipDialog
@@ -43,8 +42,6 @@ namespace FileBackupUtility
                 return this.folderDialog;
             }
         }
-        private ConnectionStringBuilder ConnectionBuilder { get; set; }
-        private string Connection { get; set; }
 
         private void InitializeListViewEnhancements()
         {
@@ -58,23 +55,38 @@ namespace FileBackupUtility
             };
         }
 
-        private BackgroundWorker InitializeBackgroundWorker()
+        private BackgroundWorker InitializeListViewWorker()
         {
+            const int FilesChunkSize = 30;
             var worker = new BackgroundWorker { WorkerReportsProgress = true, WorkerSupportsCancellation = false };
 
             worker.DoWork += (sender, e) =>
             {
-                this.files.Clear();
+                int progress = 0;
+                var filesChunk = new FileItem[FilesChunkSize];
                 foreach (var file in this.files.AddRange(options))
-                    worker.ReportProgress(0, file);
+                {
+                    int currentIndex = progress % FilesChunkSize;
+
+                    if(currentIndex == 0)
+                        worker.ReportProgress(progress, filesChunk);
+
+                    filesChunk[currentIndex] = file;
+                    progress++;
+                }
+                worker.ReportProgress(progress, filesChunk);
             };
 
             worker.ProgressChanged += (sender, e) =>
             {
-                var file = (FileItem)e.UserState;
-                this.lvFileItems.Items.Add(
-                    new ListViewItem(
-                        new string[] { file.Name, string.Format("{0:0.0} kB", (file.Size / 1024d)) }) { ToolTipText = System.IO.Path.Combine(file.Folder, file.Name) });
+                var filesChunk = (FileItem[])e.UserState;
+
+                int filesCount = (e.ProgressPercentage == 0) ? 0 : ((filesCount = e.ProgressPercentage % FilesChunkSize) == 0) ? FilesChunkSize : filesCount;
+
+                for (int i = 0; i < filesCount; i++)
+                    this.lvFileItems.Items.Add(
+                        new ListViewItem(
+                            new string[] { filesChunk[i].Name, string.Format("{0:0.0} kB", (filesChunk[i].Size / 1024d)) }) { ToolTipText = System.IO.Path.Combine(filesChunk[i].Folder, filesChunk[i].Name) });
             };
 
             worker.RunWorkerCompleted += (sender, e) =>
@@ -88,34 +100,36 @@ namespace FileBackupUtility
         #region User's workflow
         private void btnTestConnection_Click(object sender, EventArgs e)
         {
-            this.ConnectionBuilder.DataSource = this.txtServer.Text;
-            this.ConnectionBuilder.Port = this.txtPort.Text;
-            this.ConnectionBuilder.IsIPSelected = this.cbIPAddress.Checked;
-            this.ConnectionBuilder.IsSqlAuth = this.rbSqlAuth.Checked;
-            this.ConnectionBuilder.UserID = this.txtUsername.Text;
-            this.ConnectionBuilder.Password = this.txtPassword.Text;
-            this.ConnectionBuilder.InitialCatalog = "DUNNO";
-            this.Connection = this.ConnectionBuilder.GetFullConnectionString();
+            var builder = SqlDbManager.ConnectionBuilder;
+            builder.DataSource = (this.cbIPAddress.Checked) ? string.Format("{0},{1}", this.txtServer.Text, this.txtPort.Text) : this.txtServer.Text;
+            builder.IntegratedSecurity = !this.rbSqlAuth.Checked;
+            builder.UserID = this.txtUsername.Text;
+            builder.Password = this.txtPassword.Text;
 
-            if (true)//SqlDbManager.TestConnection(this.Connection))
+            if (SqlDbManager.TestConnection())
             {
-                this.cmbDatabaseNames.DataSource = new string[] { "DB1", "DB2", "DB3" };//SqlDbManager.GetAllDatabases(this.Connection);
+                this.cmbDatabaseNames.DataSource = SqlDbManager.GetAllDatabases();
                 this.SetValidConnectionEnabled(true);
             }
         }
 
         private void btnCreateTable_Click(object sender, EventArgs e)
         {
-            if (false)//SqlDbManager.CheckTableExists(this.txtTableName.Text, this.Connection))
+            var success = SqlDbManager.CreateTable(this.cmbDatabaseNames.SelectedValue.ToString(), this.txtTableName.Text, false);
+
+            if (success == false)
             {
-                if (true)
-                    SqlDbManager.DropTable(this.txtTableName.Text, this.Connection);
+                // Table exists, promp user for overriding an existing table.
+                // If user chooses to override it then the following applies.
+                success = SqlDbManager.CreateTable(this.cmbDatabaseNames.SelectedValue.ToString(), this.txtTableName.Text, true);
             }
 
-            //SqlDbManager.CreateTable(this.txtTableName.Text, this.Connection);
-            this.isValidDataTable = true;
-            this.btnCreateTable.Image = Properties.Resources.DataTableOK;
-            this.SetProcessButtenEnabled();
+            if (success == true)
+            {
+                this.btnCreateTable.Image = Properties.Resources.DataTableOK;
+                this.isValidDataTable = true;
+                this.SetProcessButtenEnabled();
+            }
         }
 
         private void btnBrowse_Click(object sender, EventArgs e)
@@ -134,24 +148,26 @@ namespace FileBackupUtility
 
             if (!dialogResult)
             {
-                this.btnProcess.Enabled = false;
+                this.ClearFileItems();
+                this.SetProcessButtenEnabled();
                 this.txtBrowse.Text = string.Empty;
             }
         }
 
         private void btnReady_Click(object sender, EventArgs e)
         {
+            if (string.IsNullOrEmpty(this.options.Root = this.txtBrowse.Text))
+                return;
+
             this.options.FileSizeLimit = (int)this.nudFileSizeLimit.Value * 1024;
             this.options.FileCountLimit = (int)this.nudFileCountLimit.Value;
             this.options.IsIncludeFilters = this.rbFiltersInclude.Checked;
             this.options.SetExtensionFilters(this.txtFilters.Text);
-
             this.options.IsArchiveRoot = this.rbZip.Checked;
-            this.options.Root = this.txtBrowse.Text;
-            this.options.SearchOption = (this.cbSubfolders.Checked) ? System.IO.SearchOption.AllDirectories : System.IO.SearchOption.TopDirectoryOnly;
+            this.options.IncludeSubfolders = this.cbSubfolders.Checked;
 
-            this.lvFileItems.Items.Clear();
-            this.InitializeBackgroundWorker().RunWorkerAsync();
+            this.ClearFileItems();
+            this.InitializeListViewWorker().RunWorkerAsync();
         }
 
         private void btnProcess_Click(object sender, EventArgs e)
@@ -218,7 +234,6 @@ namespace FileBackupUtility
 
         private void serverOrAuthentificationChanged(object sender, EventArgs e)
         {
-            this.isValidConnection = false;
             this.SetValidConnectionEnabled(false);
             this.databaseOrTableNameChanged(sender, e);
         }
@@ -230,9 +245,16 @@ namespace FileBackupUtility
             this.SetProcessButtenEnabled();
         }
 
+        private void ClearFileItems()
+        {
+            this.files.Clear();
+            this.lvFileItems.Items.Clear();
+        }
+
         private void SetValidConnectionEnabled(bool enable)
         {
-            this.isValidConnection = this.lbDBName.Enabled = this.lbDTName.Enabled = this.cmbDatabaseNames.Enabled = this.txtTableName.Enabled = this.btnCreateTable.Enabled = enable;
+            this.btnTestConnection.Image = (enable) ? Properties.Resources.ConnectionOK : Properties.Resources.ConnectionUKNOWN;
+            this.lbDBName.Enabled = this.lbDTName.Enabled = this.cmbDatabaseNames.Enabled = this.txtTableName.Enabled = this.btnCreateTable.Enabled = enable;
         }
 
         private void SetProcessButtenEnabled()

@@ -7,9 +7,31 @@ namespace FileBackupUtility.DatabaseController
 {
     class SqlDbManager
     {
-        public static bool TestConnection(string connection)
+        private static string DataTableName;
+        private static readonly SqlConnectionStringBuilder Builder = new SqlConnectionStringBuilder() { NetworkLibrary = "DBMSSOCN" };
+        public static SqlConnectionStringBuilder ConnectionBuilder { get { return Builder; } }
+
+        private static void SetConnection(bool includeInitialCatalog)
         {
-            using (SqlConnection conn = new SqlConnection(connection))
+            if(Builder.IntegratedSecurity)
+            {
+                Builder.Remove("User ID");
+                Builder.Remove("Password");
+            }
+
+            if (!includeInitialCatalog)
+                Builder.Remove("Initial Catalog");
+        }
+
+        private static SqlConnection GetConnection()
+        {
+            return new SqlConnection(Builder.ToString());
+        }
+
+        public static bool TestConnection()
+        {
+            SetConnection(false);
+            using (var conn = GetConnection())
             {
                 try { conn.Open(); }
                 catch (InvalidOperationException) { return false; }
@@ -20,15 +42,15 @@ namespace FileBackupUtility.DatabaseController
             return true;
         }
 
-        public static List<string> GetAllDatabases(string connString)
+        public static List<string> GetAllDatabases()
         {
-            var databaseNames = new List<string>();
-            using (SqlConnection con = new SqlConnection(connString))
+            var databaseNames = new  List<string>();
+            using (var conn = GetConnection())
             {
-                try { con.Open(); }
+                try { conn.Open(); }
                 catch (SqlException) { return null; }
 
-                using (var cmd = new SqlCommand("SELECT name from sys.databases", con))
+                using (var cmd = new SqlCommand("SELECT name FROM sys.databases", conn))
                 {
                     try
                     {
@@ -42,62 +64,64 @@ namespace FileBackupUtility.DatabaseController
             return databaseNames;
         }
 
-        public static void CreateTable(string tableName, string connection)
+        public static bool? CreateTable(string databaseName, string tableName, bool overrideExistingTable)
         {
-            string newTableQuery = string.Format("CREATE TABLE {0} (ID INT PRIMARY KEY IDENTITY,Folder VARCHAR(MAX) NOT NULL,FileName VARCHAR(200) NOT NULL,Exstension VARCHAR(200) NOT NULL,FileSize INT NOT NULL, Base64 TEXT NOT NULL, MD5Hash CHAR(32) NOT NULL, FileDateCreated DATETIME NULL,FileDateModified DATETIME  NULL)", tableName);
+            Builder.InitialCatalog = databaseName;
+            SetConnection(true);
 
-            using (var conn = new SqlConnection(connection))
+            using (var conn = GetConnection())
             {
                 try { conn.Open(); }
-                catch (SqlException) { }
+                catch (SqlException) { return null; }
 
-                using (var cmd = new SqlCommand(newTableQuery, conn))
-                    if (!CheckTableExists(connection, tableName))
-                        ExecuteCommand(cmd);
-            }
-        }
+                if (overrideExistingTable)
+                    DropTable(conn);
+                else if (CheckTableExists(conn))
+                    return false;
 
-        public static bool CheckTableExists(string connection, string tableName)
-        {
-            string sql = string.Format("SELECT count(*) as IsExists FROM dbo.sysobjects where id = object_id('[dbo].[{0}]')", tableName);
+                DataTableName = tableName;
+                string createTableQuery = "CREATE TABLE @tablename (ID INT PRIMARY KEY IDENTITY,Folder VARCHAR(MAX) NOT NULL,FileName VARCHAR(200) NOT NULL,Exstension VARCHAR(200) NOT NULL,FileSize INT NOT NULL, Base64 TEXT NOT NULL, MD5Hash CHAR(32) NOT NULL, FileDateCreated DATETIME NULL,FileDateModified DATETIME  NULL)";
 
-            using (var conn = new SqlConnection(connection))
-            {
-                var cmd = new SqlCommand(sql, conn);
-
-                try
+                using (var cmd = new SqlCommand(createTableQuery, conn))
                 {
-                    conn.Open();
-                    if ((int)cmd.ExecuteScalar() > 0)
-                        return true;
+                    cmd.Parameters.Add("@tablename", SqlDbType.NVarChar).Value = DataTableName;
+                    ExecuteCommand(cmd);
+                    return true;
                 }
-                catch (SqlException) { }
             }
-            return false;
         }
 
-        public static void DropTable(string tableName, string connection)
+        private static bool CheckTableExists(SqlConnection conn)
         {
-            string dropTableQuery = "DROP TABLE " + tableName;
+            string selectTableQuery = "SELECT count(*) as IsExists FROM dbo.sysobjects where id = object_id('[dbo].[@tablename]')";
 
-            using (var conn = new SqlConnection(connection))
+            using (var cmd = new SqlCommand(selectTableQuery, conn))
             {
-                try { conn.Open(); }
-                catch (SqlException) { }
+                cmd.Parameters.Add("@tablename", SqlDbType.NVarChar).Value = DataTableName;
 
-                using (var cmd = new SqlCommand(dropTableQuery, conn))
-                    using (var drop = new SqlCommand(dropTableQuery, conn))
-                        ExecuteCommand(drop);
+                if ((int)cmd.ExecuteScalar() > 0)
+                    return true;
+                else
+                    return false;
             }
         }
 
-        public static void SaveFileItem(string connection, string tableName)
+        private static void DropTable(SqlConnection conn)
         {
-            //using (SqlConnection conn = new SqlConnection(connection))
-            //    InsertRecord(tableName, conn, file);
+            string dropTableQuery = "DROP TABLE @tablename";
+            using (var cmd = new SqlCommand(dropTableQuery, conn))
+            {
+                cmd.Parameters.Add("@tablename", SqlDbType.NVarChar).Value = DataTableName;
+                ExecuteCommand(cmd);
+            }
         }
 
-        private static void InsertRecord(string tableName, SqlConnection conn)
+        public static void SaveFileItems(FileBackupUtility.FileController.FileItemCollection files)
+        {
+            // TODO
+        }
+
+        private static void InsertRecord(SqlConnection conn, string tableName)
         {
             //conn.Open();
 

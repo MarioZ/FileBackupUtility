@@ -50,12 +50,10 @@
             this.nudFileSizeLimit = new System.Windows.Forms.NumericUpDown();
             this.lbFileSizeLimit = new System.Windows.Forms.Label();
             this.gbDatabaseSettings = new System.Windows.Forms.GroupBox();
-            this.btnCreateTable = new System.Windows.Forms.Button();
             this.cmbDatabaseNames = new System.Windows.Forms.ComboBox();
             this.txtTableName = new System.Windows.Forms.TextBox();
             this.lbDTName = new System.Windows.Forms.Label();
             this.lbDBName = new System.Windows.Forms.Label();
-            this.btnTestConnection = new System.Windows.Forms.Button();
             this.txtPassword = new System.Windows.Forms.TextBox();
             this.txtUsername = new System.Windows.Forms.TextBox();
             this.lbPassword = new System.Windows.Forms.Label();
@@ -67,6 +65,8 @@
             this.lbPort = new System.Windows.Forms.Label();
             this.txtServer = new System.Windows.Forms.TextBox();
             this.lbServer = new System.Windows.Forms.Label();
+            this.btnCreateTable = new System.Windows.Forms.Button();
+            this.btnTestConnection = new System.Windows.Forms.Button();
             this.btnBrowse = new System.Windows.Forms.Button();
             this.btnAbort = new System.Windows.Forms.Button();
             this.btnProcess = new System.Windows.Forms.Button();
@@ -94,7 +94,7 @@
             this.lvFileItems.Location = new System.Drawing.Point(352, 12);
             this.lvFileItems.Name = "lvFileItems";
             this.lvFileItems.ShowItemToolTips = true;
-            this.lvFileItems.Size = new System.Drawing.Size(350, 474);
+            this.lvFileItems.Size = new System.Drawing.Size(350, 464);
             this.lvFileItems.TabIndex = 0;
             this.lvFileItems.TabStop = false;
             this.lvFileItems.UseCompatibleStateImageBehavior = false;
@@ -115,7 +115,7 @@
             // progressBar
             // 
             this.progressBar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.progressBar.Location = new System.Drawing.Point(352, 492);
+            this.progressBar.Location = new System.Drawing.Point(352, 482);
             this.progressBar.Name = "progressBar";
             this.progressBar.Size = new System.Drawing.Size(350, 23);
             this.progressBar.TabIndex = 3;
@@ -129,7 +129,7 @@
             // 
             // gbFolderSettings
             // 
-            this.gbFolderSettings.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            this.gbFolderSettings.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.gbFolderSettings.Controls.Add(this.cbSubfolders);
             this.gbFolderSettings.Controls.Add(this.txtBrowse);
@@ -137,7 +137,7 @@
             this.gbFolderSettings.Controls.Add(this.rbFolder);
             this.gbFolderSettings.Controls.Add(this.btnBrowse);
             this.gbFolderSettings.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.gbFolderSettings.Location = new System.Drawing.Point(13, 286);
+            this.gbFolderSettings.Location = new System.Drawing.Point(13, 274);
             this.gbFolderSettings.Name = "gbFolderSettings";
             this.gbFolderSettings.Size = new System.Drawing.Size(325, 117);
             this.gbFolderSettings.TabIndex = 9;
@@ -199,8 +199,7 @@
             // 
             // gbFileSettings
             // 
-            this.gbFileSettings.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.gbFileSettings.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.gbFileSettings.Controls.Add(this.rbFiltersExclude);
             this.gbFileSettings.Controls.Add(this.rbFiltersInclude);
@@ -212,7 +211,7 @@
             this.gbFileSettings.Controls.Add(this.nudFileSizeLimit);
             this.gbFileSettings.Controls.Add(this.lbFileSizeLimit);
             this.gbFileSettings.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.gbFileSettings.Location = new System.Drawing.Point(13, 409);
+            this.gbFileSettings.Location = new System.Drawing.Point(13, 397);
             this.gbFileSettings.Name = "gbFileSettings";
             this.gbFileSettings.Size = new System.Drawing.Size(325, 172);
             this.gbFileSettings.TabIndex = 10;
@@ -336,23 +335,10 @@
             this.gbDatabaseSettings.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.gbDatabaseSettings.Location = new System.Drawing.Point(13, 12);
             this.gbDatabaseSettings.Name = "gbDatabaseSettings";
-            this.gbDatabaseSettings.Size = new System.Drawing.Size(325, 268);
+            this.gbDatabaseSettings.Size = new System.Drawing.Size(325, 256);
             this.gbDatabaseSettings.TabIndex = 11;
             this.gbDatabaseSettings.TabStop = false;
             this.gbDatabaseSettings.Text = "Database Settings";
-            // 
-            // btnCreateTable
-            // 
-            this.btnCreateTable.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnCreateTable.Enabled = false;
-            this.btnCreateTable.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.btnCreateTable.Image = global::FileBackupUtility.Properties.Resources.DataTableUNKNOWN;
-            this.btnCreateTable.Location = new System.Drawing.Point(274, 212);
-            this.btnCreateTable.Name = "btnCreateTable";
-            this.btnCreateTable.Size = new System.Drawing.Size(45, 47);
-            this.btnCreateTable.TabIndex = 17;
-            this.btnCreateTable.UseVisualStyleBackColor = true;
-            this.btnCreateTable.Click += new System.EventHandler(this.btnCreateTable_Click);
             // 
             // cmbDatabaseNames
             // 
@@ -361,9 +347,9 @@
             this.cmbDatabaseNames.Enabled = false;
             this.cmbDatabaseNames.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.cmbDatabaseNames.FormattingEnabled = true;
-            this.cmbDatabaseNames.Location = new System.Drawing.Point(98, 212);
+            this.cmbDatabaseNames.Location = new System.Drawing.Point(99, 200);
             this.cmbDatabaseNames.Name = "cmbDatabaseNames";
-            this.cmbDatabaseNames.Size = new System.Drawing.Size(170, 21);
+            this.cmbDatabaseNames.Size = new System.Drawing.Size(169, 21);
             this.cmbDatabaseNames.TabIndex = 16;
             this.cmbDatabaseNames.SelectedIndexChanged += new System.EventHandler(this.databaseOrTableNameChanged);
             // 
@@ -373,9 +359,9 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtTableName.Enabled = false;
             this.txtTableName.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.txtTableName.Location = new System.Drawing.Point(97, 239);
+            this.txtTableName.Location = new System.Drawing.Point(99, 227);
             this.txtTableName.Name = "txtTableName";
-            this.txtTableName.Size = new System.Drawing.Size(171, 20);
+            this.txtTableName.Size = new System.Drawing.Size(169, 20);
             this.txtTableName.TabIndex = 15;
             this.txtTableName.TextChanged += new System.EventHandler(this.databaseOrTableNameChanged);
             // 
@@ -384,7 +370,7 @@
             this.lbDTName.AutoSize = true;
             this.lbDTName.Enabled = false;
             this.lbDTName.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.lbDTName.Location = new System.Drawing.Point(8, 242);
+            this.lbDTName.Location = new System.Drawing.Point(8, 230);
             this.lbDTName.Name = "lbDTName";
             this.lbDTName.Size = new System.Drawing.Size(66, 13);
             this.lbDTName.TabIndex = 13;
@@ -395,22 +381,11 @@
             this.lbDBName.AutoSize = true;
             this.lbDBName.Enabled = false;
             this.lbDBName.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.lbDBName.Location = new System.Drawing.Point(8, 215);
+            this.lbDBName.Location = new System.Drawing.Point(8, 203);
             this.lbDBName.Name = "lbDBName";
             this.lbDBName.Size = new System.Drawing.Size(85, 13);
             this.lbDBName.TabIndex = 12;
             this.lbDBName.Text = "Database name:";
-            // 
-            // btnTestConnection
-            // 
-            this.btnTestConnection.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.btnTestConnection.Location = new System.Drawing.Point(5, 183);
-            this.btnTestConnection.Name = "btnTestConnection";
-            this.btnTestConnection.Size = new System.Drawing.Size(314, 23);
-            this.btnTestConnection.TabIndex = 11;
-            this.btnTestConnection.Text = "Test Connection";
-            this.btnTestConnection.UseVisualStyleBackColor = true;
-            this.btnTestConnection.Click += new System.EventHandler(this.btnTestConnection_Click);
             // 
             // txtPassword
             // 
@@ -418,9 +393,9 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtPassword.Enabled = false;
             this.txtPassword.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.txtPassword.Location = new System.Drawing.Point(99, 157);
+            this.txtPassword.Location = new System.Drawing.Point(99, 158);
             this.txtPassword.Name = "txtPassword";
-            this.txtPassword.Size = new System.Drawing.Size(220, 20);
+            this.txtPassword.Size = new System.Drawing.Size(169, 20);
             this.txtPassword.TabIndex = 10;
             this.txtPassword.TextChanged += new System.EventHandler(this.serverOrAuthentificationChanged);
             // 
@@ -430,9 +405,9 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtUsername.Enabled = false;
             this.txtUsername.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.txtUsername.Location = new System.Drawing.Point(99, 133);
+            this.txtUsername.Location = new System.Drawing.Point(99, 131);
             this.txtUsername.Name = "txtUsername";
-            this.txtUsername.Size = new System.Drawing.Size(220, 20);
+            this.txtUsername.Size = new System.Drawing.Size(169, 20);
             this.txtUsername.TabIndex = 9;
             this.txtUsername.TextChanged += new System.EventHandler(this.serverOrAuthentificationChanged);
             // 
@@ -441,7 +416,7 @@
             this.lbPassword.AutoSize = true;
             this.lbPassword.Enabled = false;
             this.lbPassword.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.lbPassword.Location = new System.Drawing.Point(35, 160);
+            this.lbPassword.Location = new System.Drawing.Point(35, 161);
             this.lbPassword.Name = "lbPassword";
             this.lbPassword.Size = new System.Drawing.Size(56, 13);
             this.lbPassword.TabIndex = 8;
@@ -452,7 +427,7 @@
             this.lbUsername.AutoSize = true;
             this.lbUsername.Enabled = false;
             this.lbUsername.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.lbUsername.Location = new System.Drawing.Point(35, 136);
+            this.lbUsername.Location = new System.Drawing.Point(35, 134);
             this.lbUsername.Name = "lbUsername";
             this.lbUsername.Size = new System.Drawing.Size(58, 13);
             this.lbUsername.TabIndex = 7;
@@ -462,7 +437,7 @@
             // 
             this.rbSqlAuth.AutoSize = true;
             this.rbSqlAuth.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.rbSqlAuth.Location = new System.Drawing.Point(6, 113);
+            this.rbSqlAuth.Location = new System.Drawing.Point(6, 111);
             this.rbSqlAuth.Name = "rbSqlAuth";
             this.rbSqlAuth.Size = new System.Drawing.Size(147, 17);
             this.rbSqlAuth.TabIndex = 6;
@@ -475,7 +450,7 @@
             this.rbWinAuth.AutoSize = true;
             this.rbWinAuth.Checked = true;
             this.rbWinAuth.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.rbWinAuth.Location = new System.Drawing.Point(6, 90);
+            this.rbWinAuth.Location = new System.Drawing.Point(6, 88);
             this.rbWinAuth.Name = "rbWinAuth";
             this.rbWinAuth.Size = new System.Drawing.Size(144, 17);
             this.rbWinAuth.TabIndex = 5;
@@ -541,6 +516,30 @@
             this.lbServer.TabIndex = 0;
             this.lbServer.Text = "Server:";
             // 
+            // btnCreateTable
+            // 
+            this.btnCreateTable.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnCreateTable.Enabled = false;
+            this.btnCreateTable.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.btnCreateTable.Image = global::FileBackupUtility.Properties.Resources.DataTableUNKNOWN;
+            this.btnCreateTable.Location = new System.Drawing.Point(274, 200);
+            this.btnCreateTable.Name = "btnCreateTable";
+            this.btnCreateTable.Size = new System.Drawing.Size(45, 47);
+            this.btnCreateTable.TabIndex = 17;
+            this.btnCreateTable.UseVisualStyleBackColor = true;
+            this.btnCreateTable.Click += new System.EventHandler(this.btnCreateTable_Click);
+            // 
+            // btnTestConnection
+            // 
+            this.btnTestConnection.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.btnTestConnection.Image = global::FileBackupUtility.Properties.Resources.ConnectionUKNOWN;
+            this.btnTestConnection.Location = new System.Drawing.Point(274, 88);
+            this.btnTestConnection.Name = "btnTestConnection";
+            this.btnTestConnection.Size = new System.Drawing.Size(45, 90);
+            this.btnTestConnection.TabIndex = 11;
+            this.btnTestConnection.UseVisualStyleBackColor = true;
+            this.btnTestConnection.Click += new System.EventHandler(this.btnTestConnection_Click);
+            // 
             // btnBrowse
             // 
             this.btnBrowse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -559,9 +558,9 @@
             this.btnAbort.Enabled = false;
             this.btnAbort.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.btnAbort.Image = global::FileBackupUtility.Properties.Resources.Abort;
-            this.btnAbort.Location = new System.Drawing.Point(602, 521);
+            this.btnAbort.Location = new System.Drawing.Point(602, 511);
             this.btnAbort.Name = "btnAbort";
-            this.btnAbort.Size = new System.Drawing.Size(100, 60);
+            this.btnAbort.Size = new System.Drawing.Size(100, 58);
             this.btnAbort.TabIndex = 7;
             this.btnAbort.UseVisualStyleBackColor = true;
             this.btnAbort.Click += new System.EventHandler(this.btnAbort_Click);
@@ -572,9 +571,9 @@
             this.btnProcess.Enabled = false;
             this.btnProcess.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.btnProcess.Image = global::FileBackupUtility.Properties.Resources.Process;
-            this.btnProcess.Location = new System.Drawing.Point(458, 521);
+            this.btnProcess.Location = new System.Drawing.Point(458, 511);
             this.btnProcess.Name = "btnProcess";
-            this.btnProcess.Size = new System.Drawing.Size(138, 60);
+            this.btnProcess.Size = new System.Drawing.Size(138, 58);
             this.btnProcess.TabIndex = 2;
             this.btnProcess.UseVisualStyleBackColor = true;
             this.btnProcess.Click += new System.EventHandler(this.btnProcess_Click);
@@ -584,9 +583,9 @@
             this.btnReady.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnReady.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.btnReady.Image = global::FileBackupUtility.Properties.Resources.Ready;
-            this.btnReady.Location = new System.Drawing.Point(352, 521);
+            this.btnReady.Location = new System.Drawing.Point(352, 511);
             this.btnReady.Name = "btnReady";
-            this.btnReady.Size = new System.Drawing.Size(100, 60);
+            this.btnReady.Size = new System.Drawing.Size(100, 58);
             this.btnReady.TabIndex = 1;
             this.btnReady.UseVisualStyleBackColor = true;
             this.btnReady.Click += new System.EventHandler(this.btnReady_Click);
@@ -603,7 +602,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(714, 586);
+            this.ClientSize = new System.Drawing.Size(714, 576);
             this.Controls.Add(this.gbDatabaseSettings);
             this.Controls.Add(this.gbFileSettings);
             this.Controls.Add(this.gbFolderSettings);
@@ -613,7 +612,7 @@
             this.Controls.Add(this.btnReady);
             this.Controls.Add(this.lvFileItems);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
-            this.MinimumSize = new System.Drawing.Size(730, 620);
+            this.MinimumSize = new System.Drawing.Size(730, 610);
             this.Name = "MainForm";
             this.Text = "File Backup Utility";
             this.lvContextMenuStrip.ResumeLayout(false);

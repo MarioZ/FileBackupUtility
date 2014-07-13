@@ -73,6 +73,26 @@ namespace FileBackupUtility.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap ConnectionOK {
+            get {
+                object obj = ResourceManager.GetObject("ConnectionOK", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ConnectionUKNOWN {
+            get {
+                object obj = ResourceManager.GetObject("ConnectionUKNOWN", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap DataTableOK {
             get {
                 object obj = ResourceManager.GetObject("DataTableOK", resourceCulture);

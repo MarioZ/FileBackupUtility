@@ -9,7 +9,7 @@ namespace FileBackupUtility.FileController
         public string Root { get; set; }
         public bool IsArchiveRoot { get; set; }
         public bool IsIncludeFilters { get; set; }
-        public System.IO.SearchOption SearchOption { get; set; }
+        public bool IncludeSubfolders { get; set; }
         public int FileSizeLimit { get; set; }
         public int FileCountLimit { get; set; }
 
