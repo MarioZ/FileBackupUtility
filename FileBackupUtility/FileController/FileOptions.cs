@@ -2,7 +2,7 @@
 
 namespace FileBackupUtility.FileController
 {
-    public class FileOptions
+    public sealed class FileOptions
     {
         private string[] extensionFilters;
 

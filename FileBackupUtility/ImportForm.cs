@@ -7,20 +7,26 @@ using FileBackupUtility.FolderSelect;
 
 namespace FileBackupUtility
 {
-    public partial class MainForm : Form
+    public partial class ImportForm : Form
     {
         private FileItemCollection files;
         private FileOptions options;
+        private IDatabaseManager databaseManager;
+
         private OpenFileDialog zipDialog;
         private FolderSelectDialog folderDialog;
+
         private bool isValidDataTable;
 
-        public MainForm()
+        public ImportForm(IDatabaseManager databaseManager)
         {
             this.InitializeComponent();
             this.InitializeListViewEnhancements();
+
             this.files = new FileItemCollection();
             this.options = new FileOptions();
+            this.databaseManager = databaseManager;
+
             this.isValidDataTable = false;
         }
 
@@ -97,39 +103,44 @@ namespace FileBackupUtility
             return worker;
         }
 
-        #region User's workflow
         private void btnTestConnection_Click(object sender, EventArgs e)
         {
-            var builder = SqlDbManager.ConnectionBuilder;
-            builder.DataSource = (this.cbIPAddress.Checked) ? string.Format("{0},{1}", this.txtServer.Text, this.txtPort.Text) : this.txtServer.Text;
-            builder.IntegratedSecurity = !this.rbSqlAuth.Checked;
-            builder.UserID = this.txtUsername.Text;
-            builder.Password = this.txtPassword.Text;
-
-            if (SqlDbManager.TestConnection())
+            var connectionOptions = new ConnectionOptions()
             {
-                this.cmbDatabaseNames.DataSource = SqlDbManager.GetAllDatabases();
+                ServerName = (this.cbIPAddress.Checked) ? string.Format("{0},{1}", this.txtServer.Text, this.txtPort.Text) : this.txtServer.Text,
+                IntegratedSecurity = !this.rbSqlAuth.Checked,
+                UserName = this.txtUsername.Text,
+                Password = this.txtPassword.Text,
+                DatabaseName = string.Empty
+            };
+
+            this.databaseManager.SetConnection(connectionOptions);
+            if (this.databaseManager.TestConnection())
+            {
+                this.cmbDatabaseNames.DataSource = this.databaseManager.GetDatabaseNames();
                 this.SetValidConnectionEnabled(true);
             }
         }
 
         private void btnCreateTable_Click(object sender, EventArgs e)
         {
-            var success = SqlDbManager.CreateTable(this.cmbDatabaseNames.SelectedValue.ToString(), this.txtTableName.Text, false);
-
-            if (success == false)
+            if (this.databaseManager.CheckTableExists(this.cmbDatabaseNames.Text, this.txtTableName.Text))
             {
-                // Table exists, promp user for overriding an existing table.
-                // If user chooses to override it then the following applies.
-                success = SqlDbManager.CreateTable(this.cmbDatabaseNames.SelectedValue.ToString(), this.txtTableName.Text, true);
+                if (MessageBox.Show(string.Format("DataTable \"{0}\" already exists.{1}Press OK if you want to override it.", this.txtTableName.Text, Environment.NewLine),
+                                    "DataTable exists!",
+                                    MessageBoxButtons.OKCancel) == DialogResult.OK)
+                    this.CreateTable(true);
             }
+            else
+                this.CreateTable(false);
+        }
 
-            if (success == true)
-            {
-                this.btnCreateTable.Image = Properties.Resources.DataTableOK;
-                this.isValidDataTable = true;
-                this.SetProcessButtenEnabled();
-            }
+        private void CreateTable(bool overrideTable)
+        {
+            this.databaseManager.CreateTable(this.txtTableName.Text, overrideTable);
+            this.btnCreateTable.Image = Properties.Resources.DataTableOK;
+            this.isValidDataTable = true;
+            this.SetProcessButtenEnabled();
         }
 
         private void btnBrowse_Click(object sender, EventArgs e)
@@ -181,7 +192,6 @@ namespace FileBackupUtility
             // TODO
             this.SetSettingsGroupBoxEnabled(true);
         }
-        #endregion
 
         private void lvFileItems_MouseClick(object sender, MouseEventArgs e)
         {

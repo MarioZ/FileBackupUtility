@@ -1,6 +1,6 @@
 ﻿namespace FileBackupUtility
 {
-    partial class MainForm
+    partial class ImportForm
     {
         /// <summary>
         /// Required designer variable.
