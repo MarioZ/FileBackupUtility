@@ -34,11 +34,13 @@
             this.column2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.progressBar = new System.Windows.Forms.ProgressBar();
             this.lvContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.lvToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.gbFolderSettings = new System.Windows.Forms.GroupBox();
             this.cbSubfolders = new System.Windows.Forms.CheckBox();
             this.txtBrowse = new System.Windows.Forms.TextBox();
             this.rbZip = new System.Windows.Forms.RadioButton();
             this.rbFolder = new System.Windows.Forms.RadioButton();
+            this.btnBrowse = new System.Windows.Forms.Button();
             this.gbFileSettings = new System.Windows.Forms.GroupBox();
             this.rbFiltersExclude = new System.Windows.Forms.RadioButton();
             this.rbFiltersInclude = new System.Windows.Forms.RadioButton();
@@ -50,10 +52,12 @@
             this.nudFileSizeLimit = new System.Windows.Forms.NumericUpDown();
             this.lbFileSizeLimit = new System.Windows.Forms.Label();
             this.gbDatabaseSettings = new System.Windows.Forms.GroupBox();
+            this.btnCreateTable = new System.Windows.Forms.Button();
             this.cmbDatabaseNames = new System.Windows.Forms.ComboBox();
             this.txtTableName = new System.Windows.Forms.TextBox();
             this.lbDTName = new System.Windows.Forms.Label();
             this.lbDBName = new System.Windows.Forms.Label();
+            this.btnTestConnection = new System.Windows.Forms.Button();
             this.txtPassword = new System.Windows.Forms.TextBox();
             this.txtUsername = new System.Windows.Forms.TextBox();
             this.lbPassword = new System.Windows.Forms.Label();
@@ -65,13 +69,9 @@
             this.lbPort = new System.Windows.Forms.Label();
             this.txtServer = new System.Windows.Forms.TextBox();
             this.lbServer = new System.Windows.Forms.Label();
-            this.btnCreateTable = new System.Windows.Forms.Button();
-            this.btnTestConnection = new System.Windows.Forms.Button();
-            this.btnBrowse = new System.Windows.Forms.Button();
             this.btnAbort = new System.Windows.Forms.Button();
             this.btnProcess = new System.Windows.Forms.Button();
             this.btnReady = new System.Windows.Forms.Button();
-            this.lvToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lvContextMenuStrip.SuspendLayout();
             this.gbFolderSettings.SuspendLayout();
             this.gbFileSettings.SuspendLayout();
@@ -127,6 +127,14 @@
             this.lvContextMenuStrip.Name = "lvContextMenuStrip";
             this.lvContextMenuStrip.Size = new System.Drawing.Size(165, 26);
             // 
+            // lvToolStripMenuItem
+            // 
+            this.lvToolStripMenuItem.Image = global::FileBackupUtility.Properties.Resources.Remove;
+            this.lvToolStripMenuItem.Name = "lvToolStripMenuItem";
+            this.lvToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
+            this.lvToolStripMenuItem.Text = "Remove Selected";
+            this.lvToolStripMenuItem.Click += new System.EventHandler(this.lvToolStripMenuItem_Click);
+            // 
             // gbFolderSettings
             // 
             this.gbFolderSettings.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -158,6 +166,7 @@
             this.cbSubfolders.TabIndex = 13;
             this.cbSubfolders.Text = "Include subfolders";
             this.cbSubfolders.UseVisualStyleBackColor = true;
+            this.cbSubfolders.CheckedChanged += new System.EventHandler(this.FileOrFolderSettingsChanged);
             // 
             // txtBrowse
             // 
@@ -170,6 +179,7 @@
             this.txtBrowse.ReadOnly = true;
             this.txtBrowse.Size = new System.Drawing.Size(262, 20);
             this.txtBrowse.TabIndex = 12;
+            this.txtBrowse.TextChanged += new System.EventHandler(this.FileOrFolderSettingsChanged);
             // 
             // rbZip
             // 
@@ -196,6 +206,18 @@
             this.rbFolder.Text = "Folder";
             this.rbFolder.UseVisualStyleBackColor = true;
             this.rbFolder.CheckedChanged += new System.EventHandler(this.rbFolder_CheckedChanged);
+            // 
+            // btnBrowse
+            // 
+            this.btnBrowse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnBrowse.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.btnBrowse.Image = global::FileBackupUtility.Properties.Resources.Folder;
+            this.btnBrowse.Location = new System.Drawing.Point(274, 63);
+            this.btnBrowse.Name = "btnBrowse";
+            this.btnBrowse.Size = new System.Drawing.Size(45, 45);
+            this.btnBrowse.TabIndex = 9;
+            this.btnBrowse.UseVisualStyleBackColor = true;
+            this.btnBrowse.Click += new System.EventHandler(this.btnBrowse_Click);
             // 
             // gbFileSettings
             // 
@@ -228,6 +250,7 @@
             this.rbFiltersExclude.TabIndex = 13;
             this.rbFiltersExclude.Text = "Exclude";
             this.rbFiltersExclude.UseVisualStyleBackColor = true;
+            this.rbFiltersExclude.CheckedChanged += new System.EventHandler(this.FileOrFolderSettingsChanged);
             // 
             // rbFiltersInclude
             // 
@@ -241,6 +264,7 @@
             this.rbFiltersInclude.TabStop = true;
             this.rbFiltersInclude.Text = "Include";
             this.rbFiltersInclude.UseVisualStyleBackColor = true;
+            this.rbFiltersInclude.CheckedChanged += new System.EventHandler(this.FileOrFolderSettingsChanged);
             // 
             // lbExtensionFiltersEG
             // 
@@ -264,6 +288,7 @@
             this.txtFilters.Name = "txtFilters";
             this.txtFilters.Size = new System.Drawing.Size(244, 60);
             this.txtFilters.TabIndex = 5;
+            this.txtFilters.TextChanged += new System.EventHandler(this.FileOrFolderSettingsChanged);
             // 
             // lbExtensionFilters
             // 
@@ -282,6 +307,7 @@
             this.nudFileCountLimit.Name = "nudFileCountLimit";
             this.nudFileCountLimit.Size = new System.Drawing.Size(75, 20);
             this.nudFileCountLimit.TabIndex = 3;
+            this.nudFileCountLimit.ValueChanged += new System.EventHandler(this.FileOrFolderSettingsChanged);
             // 
             // lbFileCountLimit
             // 
@@ -300,6 +326,7 @@
             this.nudFileSizeLimit.Name = "nudFileSizeLimit";
             this.nudFileSizeLimit.Size = new System.Drawing.Size(75, 20);
             this.nudFileSizeLimit.TabIndex = 1;
+            this.nudFileSizeLimit.ValueChanged += new System.EventHandler(this.FileOrFolderSettingsChanged);
             // 
             // lbFileSizeLimit
             // 
@@ -340,6 +367,19 @@
             this.gbDatabaseSettings.TabStop = false;
             this.gbDatabaseSettings.Text = "Database Settings";
             // 
+            // btnCreateTable
+            // 
+            this.btnCreateTable.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnCreateTable.Enabled = false;
+            this.btnCreateTable.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.btnCreateTable.Image = global::FileBackupUtility.Properties.Resources.DataTableUNKNOWN;
+            this.btnCreateTable.Location = new System.Drawing.Point(274, 200);
+            this.btnCreateTable.Name = "btnCreateTable";
+            this.btnCreateTable.Size = new System.Drawing.Size(45, 47);
+            this.btnCreateTable.TabIndex = 17;
+            this.btnCreateTable.UseVisualStyleBackColor = true;
+            this.btnCreateTable.Click += new System.EventHandler(this.btnCreateTable_Click);
+            // 
             // cmbDatabaseNames
             // 
             this.cmbDatabaseNames.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -351,7 +391,7 @@
             this.cmbDatabaseNames.Name = "cmbDatabaseNames";
             this.cmbDatabaseNames.Size = new System.Drawing.Size(169, 21);
             this.cmbDatabaseNames.TabIndex = 16;
-            this.cmbDatabaseNames.SelectedIndexChanged += new System.EventHandler(this.databaseOrTableNameChanged);
+            this.cmbDatabaseNames.SelectedIndexChanged += new System.EventHandler(this.DatabaseOrTableNameChanged);
             // 
             // txtTableName
             // 
@@ -363,7 +403,7 @@
             this.txtTableName.Name = "txtTableName";
             this.txtTableName.Size = new System.Drawing.Size(169, 20);
             this.txtTableName.TabIndex = 15;
-            this.txtTableName.TextChanged += new System.EventHandler(this.databaseOrTableNameChanged);
+            this.txtTableName.TextChanged += new System.EventHandler(this.DatabaseOrTableNameChanged);
             // 
             // lbDTName
             // 
@@ -387,6 +427,18 @@
             this.lbDBName.TabIndex = 12;
             this.lbDBName.Text = "Database name:";
             // 
+            // btnTestConnection
+            // 
+            this.btnTestConnection.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnTestConnection.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.btnTestConnection.Image = global::FileBackupUtility.Properties.Resources.ConnectionUKNOWN;
+            this.btnTestConnection.Location = new System.Drawing.Point(274, 88);
+            this.btnTestConnection.Name = "btnTestConnection";
+            this.btnTestConnection.Size = new System.Drawing.Size(45, 90);
+            this.btnTestConnection.TabIndex = 11;
+            this.btnTestConnection.UseVisualStyleBackColor = true;
+            this.btnTestConnection.Click += new System.EventHandler(this.btnTestConnection_Click);
+            // 
             // txtPassword
             // 
             this.txtPassword.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -397,7 +449,7 @@
             this.txtPassword.Name = "txtPassword";
             this.txtPassword.Size = new System.Drawing.Size(169, 20);
             this.txtPassword.TabIndex = 10;
-            this.txtPassword.TextChanged += new System.EventHandler(this.serverOrAuthentificationChanged);
+            this.txtPassword.TextChanged += new System.EventHandler(this.ServerOrAuthentificationChanged);
             // 
             // txtUsername
             // 
@@ -409,7 +461,7 @@
             this.txtUsername.Name = "txtUsername";
             this.txtUsername.Size = new System.Drawing.Size(169, 20);
             this.txtUsername.TabIndex = 9;
-            this.txtUsername.TextChanged += new System.EventHandler(this.serverOrAuthentificationChanged);
+            this.txtUsername.TextChanged += new System.EventHandler(this.ServerOrAuthentificationChanged);
             // 
             // lbPassword
             // 
@@ -482,7 +534,7 @@
             this.txtPort.Name = "txtPort";
             this.txtPort.Size = new System.Drawing.Size(75, 20);
             this.txtPort.TabIndex = 3;
-            this.txtPort.TextChanged += new System.EventHandler(this.serverOrAuthentificationChanged);
+            this.txtPort.TextChanged += new System.EventHandler(this.ServerOrAuthentificationChanged);
             // 
             // lbPort
             // 
@@ -504,7 +556,7 @@
             this.txtServer.Name = "txtServer";
             this.txtServer.Size = new System.Drawing.Size(231, 20);
             this.txtServer.TabIndex = 1;
-            this.txtServer.TextChanged += new System.EventHandler(this.serverOrAuthentificationChanged);
+            this.txtServer.TextChanged += new System.EventHandler(this.ServerOrAuthentificationChanged);
             // 
             // lbServer
             // 
@@ -515,42 +567,6 @@
             this.lbServer.Size = new System.Drawing.Size(41, 13);
             this.lbServer.TabIndex = 0;
             this.lbServer.Text = "Server:";
-            // 
-            // btnCreateTable
-            // 
-            this.btnCreateTable.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnCreateTable.Enabled = false;
-            this.btnCreateTable.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.btnCreateTable.Image = global::FileBackupUtility.Properties.Resources.DataTableUNKNOWN;
-            this.btnCreateTable.Location = new System.Drawing.Point(274, 200);
-            this.btnCreateTable.Name = "btnCreateTable";
-            this.btnCreateTable.Size = new System.Drawing.Size(45, 47);
-            this.btnCreateTable.TabIndex = 17;
-            this.btnCreateTable.UseVisualStyleBackColor = true;
-            this.btnCreateTable.Click += new System.EventHandler(this.btnCreateTable_Click);
-            // 
-            // btnTestConnection
-            // 
-            this.btnTestConnection.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.btnTestConnection.Image = global::FileBackupUtility.Properties.Resources.ConnectionUKNOWN;
-            this.btnTestConnection.Location = new System.Drawing.Point(274, 88);
-            this.btnTestConnection.Name = "btnTestConnection";
-            this.btnTestConnection.Size = new System.Drawing.Size(45, 90);
-            this.btnTestConnection.TabIndex = 11;
-            this.btnTestConnection.UseVisualStyleBackColor = true;
-            this.btnTestConnection.Click += new System.EventHandler(this.btnTestConnection_Click);
-            // 
-            // btnBrowse
-            // 
-            this.btnBrowse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnBrowse.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.btnBrowse.Image = global::FileBackupUtility.Properties.Resources.Folder;
-            this.btnBrowse.Location = new System.Drawing.Point(274, 63);
-            this.btnBrowse.Name = "btnBrowse";
-            this.btnBrowse.Size = new System.Drawing.Size(45, 45);
-            this.btnBrowse.TabIndex = 9;
-            this.btnBrowse.UseVisualStyleBackColor = true;
-            this.btnBrowse.Click += new System.EventHandler(this.btnBrowse_Click);
             // 
             // btnAbort
             // 
@@ -590,15 +606,7 @@
             this.btnReady.UseVisualStyleBackColor = true;
             this.btnReady.Click += new System.EventHandler(this.btnReady_Click);
             // 
-            // lvToolStripMenuItem
-            // 
-            this.lvToolStripMenuItem.Image = global::FileBackupUtility.Properties.Resources.Remove;
-            this.lvToolStripMenuItem.Name = "lvToolStripMenuItem";
-            this.lvToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
-            this.lvToolStripMenuItem.Text = "Remove Selected";
-            this.lvToolStripMenuItem.Click += new System.EventHandler(this.lvToolStripMenuItem_Click);
-            // 
-            // MainForm
+            // ImportForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -613,7 +621,7 @@
             this.Controls.Add(this.lvFileItems);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.MinimumSize = new System.Drawing.Size(730, 610);
-            this.Name = "MainForm";
+            this.Name = "ImportForm";
             this.Text = "File Backup Utility";
             this.lvContextMenuStrip.ResumeLayout(false);
             this.gbFolderSettings.ResumeLayout(false);

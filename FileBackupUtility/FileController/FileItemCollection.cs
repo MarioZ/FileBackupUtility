@@ -21,6 +21,8 @@ namespace FileBackupUtility.FileController
             this.totalfileItemsSize = 0;
         }
 
+        public FileItem this[int index] { get { return this.fileItems[index]; } }
+
         public IEnumerable<FileItem> AddRange(FileOptions options)
         {
             this.options = options;

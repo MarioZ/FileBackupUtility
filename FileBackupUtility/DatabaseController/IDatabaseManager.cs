@@ -7,7 +7,7 @@
         string[] GetDatabaseNames();
         bool CheckTableExists(string databaseName, string dataTableName);
         void CreateTable(string dataTableName, bool overrideExistingTable);
-        void InsertFileItem(FileBackupUtility.FileController.FileItem file);
+        void InsertFileItem(string dataTableName, FileBackupUtility.FileController.FileItem file);
     }
 
     public sealed class ConnectionOptions

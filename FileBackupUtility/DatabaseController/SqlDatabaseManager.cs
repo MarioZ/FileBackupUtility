@@ -9,7 +9,7 @@ namespace FileBackupUtility.DatabaseController
 
         public SqlDatabaseManager()
         {
-            this.builder = new SqlConnectionStringBuilder() { NetworkLibrary = "DBMSSOCN" };
+            this.builder = new SqlConnectionStringBuilder();
         }
 
         public void SetConnection(ConnectionOptions options)
@@ -20,6 +20,12 @@ namespace FileBackupUtility.DatabaseController
 
         private void SetConnection()
         {
+            // http://technet.microsoft.com/en-us/library/ms143531(v=sql.120).aspx
+            if (this.builder.DataSource.Contains(","))
+                this.builder.NetworkLibrary = "DBMSSOCN";
+            else
+                this.builder.Remove("Network Library");
+
             if (this.builder.IntegratedSecurity)
             {
                 this.builder.Remove("User ID");
@@ -32,6 +38,7 @@ namespace FileBackupUtility.DatabaseController
 
         private SqlConnection GetConnection()
         {
+            // http://msdn.microsoft.com/en-us/library/8xx3tyca(v=vs.110).aspx
             return new SqlConnection(builder.ConnectionString);
         }
 
@@ -83,13 +90,11 @@ namespace FileBackupUtility.DatabaseController
             this.builder.InitialCatalog = databaseName;
             this.SetConnection();
 
-            string selectTableQuery = "SELECT count(*) as IsExists FROM dbo.sysobjects where id = object_id('[dbo].[@tablename]')";
+            string selectTableQuery = "SELECT count(*) as IsExists FROM dbo.sysobjects where id = object_id('[dbo].[" + dataTableName + "]')";
             using(var conn = this.GetConnection())
             using (var cmd = new SqlCommand(selectTableQuery, conn))
             {
                 conn.Open();
-                cmd.Parameters.Add("@tablename", SqlDbType.NVarChar).Value = dataTableName;
-
                 if ((int)cmd.ExecuteScalar() > 0)
                     return true;
                 else
@@ -105,67 +110,48 @@ namespace FileBackupUtility.DatabaseController
                 if (overrideExistingTable)
                     this.DropTable(dataTableName, conn);
 
-                string createTableQuery = "CREATE TABLE @tablename (ID INT PRIMARY KEY IDENTITY,Folder VARCHAR(MAX) NOT NULL,FileName VARCHAR(200) NOT NULL,Exstension VARCHAR(200) NOT NULL,FileSize INT NOT NULL, Base64 TEXT NOT NULL, MD5Hash CHAR(32) NOT NULL, FileDateCreated DATETIME NULL,FileDateModified DATETIME  NULL)";
-                using (var cmd = new SqlCommand(createTableQuery, conn))
-                {
-                    cmd.Parameters.Add("@tablename", SqlDbType.NVarChar).Value = dataTableName;
-                    ExecuteCommand(cmd);
-                }
+                string createTableQuery = "CREATE TABLE " + dataTableName + "(Folder VARCHAR(MAX) NOT NULL,FileName VARCHAR(200) NOT NULL,Exstension VARCHAR(200) NOT NULL,FileSize INT NOT NULL,Base64 TEXT NOT NULL,MD5Hash CHAR(32) NOT NULL,FileDateCreated DATETIME NULL,FileDateModified DATETIME NULL);";
+                ExecuteQuery(createTableQuery, conn);
             }
         }
 
         private void DropTable(string dataTableName, SqlConnection conn)
         {
-            string dropTableQuery = "DROP TABLE @tablename";
-            using (var cmd = new SqlCommand(dropTableQuery, conn))
+            string dropTableQuery = "DROP TABLE " + dataTableName;
+            ExecuteQuery(dropTableQuery, conn);
+        }
+
+        public void InsertFileItem(string dataTableName, FileBackupUtility.FileController.FileItem file)
+        {
+            using (var conn = this.GetConnection())
             {
-                cmd.Parameters.Add("@tablename", SqlDbType.NVarChar).Value = dataTableName;
-                ExecuteCommand(cmd);
+                conn.Open();
+
+                string insertRecordQuery = "INSERT INTO " + dataTableName + " (Folder, FileName, Exstension, FileSize, Base64, MD5Hash, FileDateCreated, FileDateModified) VALUES (@FileFolder, @FileName, @FileExtension, @FileSize, @FileBase64, @FileMD5Hash, @FileCreated, @FileModified)";
+                using (var cmd = new SqlCommand(insertRecordQuery, conn))
+                {
+                    cmd.Parameters.AddWithValue("@FileFolder", file.Folder);
+                    cmd.Parameters.AddWithValue("@FileName", file.Name);
+                    cmd.Parameters.AddWithValue("@FileExtension", file.Extension);
+                    cmd.Parameters.AddWithValue("@FileSize", file.Size);
+                    cmd.Parameters.AddWithValue("@FileBase64", file.ToBase64String());
+                    cmd.Parameters.AddWithValue("@FileMD5Hash", file.ToMD5HashString());
+                    cmd.Parameters.AddWithValue("@FileCreated", (object)file.Created ?? System.DBNull.Value);
+                    cmd.Parameters.AddWithValue("@FileModified", (object)file.Modified ?? System.DBNull.Value);
+
+                    try { cmd.ExecuteNonQuery(); }
+                    catch (SqlException) { }
+                }
             }
         }
 
-        public void InsertFileItem(FileBackupUtility.FileController.FileItem file)
+        private static void ExecuteQuery(string query, SqlConnection conn)
         {
-            // TODO
-            //System.Text.StringBuilder insert = new System.Text.StringBuilder();
-            //insert.Append("INSERT INTO ");
-            //insert.Append(tableName);
-            ////insert.Append(" (Folder, FileName, Exstension, FileSize, Base64, MD5Hash, FileDateCreated, FileDateModified) VALUES (");
-            //insert.Append(" (Folder, FileName, Exstension, FileSize, Base64, MD5Hash) VALUES (");
-            //insert.Append("'");
-            //insert.Append(file.Folder);
-            //insert.Append("',");
-            //insert.Append(" '");
-            //insert.Append(file.Name);
-            //insert.Append("',");
-            //insert.Append(" '");
-            //insert.Append(file.Extension);
-            //insert.Append("',");
-            //insert.Append(" '");
-            //insert.Append(file.Size);
-            //insert.Append("',");
-            //insert.Append(" '");
-            //insert.Append(file.ToBase64String());
-            //insert.Append("',");
-            //insert.Append(" '");
-            //insert.Append(file.ToMD5Hash());
-            ////insert.Append("',");
-            ////insert.Append(" '");
-            //////insert.Append((file.Created) ?? DBNull.Value.ToString());
-            ////insert.Append(file.Created);
-            ////insert.Append("',");
-            ////insert.Append(" '");
-            //////insert.Append((file.Modified) ?? DBNull.Value.ToString());
-            ////insert.Append(file.Modified);
-            //insert.Append("')");
-            //using (SqlCommand cmd = new SqlCommand(insert.ToString(), conn))
-            //    ExecuteCommand(cmd);
-        }
-
-        private static void ExecuteCommand(SqlCommand cmd)
-        {
-            try { cmd.ExecuteNonQuery(); }
-            catch (SqlException) { }
+            using (var cmd = new SqlCommand(query, conn))
+            {
+                try { cmd.ExecuteNonQuery(); }
+                catch (SqlException) { }
+            }
         }
     }
 }
